@@ -1,0 +1,8 @@
+# Local secrets — never commit
+.appwrite-local.env
+
+# npm dependencies for netlify/functions (Netlify installs these itself on deploy)
+node_modules/
+
+# Local Netlify dev/runtime files
+.netlify/

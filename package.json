@@ -1,0 +1,8 @@
+{
+  "name": "homecaremumbai",
+  "private": true,
+  "description": "HomeCare Mumbai public site. Static HTML site; this package.json exists only so Netlify can install the server-side dependency used by netlify/functions/create-booking.js.",
+  "dependencies": {
+    "node-appwrite": "^28.0.0"
+  }
+}

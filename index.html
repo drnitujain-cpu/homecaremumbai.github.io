@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-  <meta name="theme-color" content="#0d7377"/>
-  <meta name="description" content="HomeCare Mumbai — Book specialist home healthcare: wound care, nursing, diagnostics, physiotherapy, doctor visits across Powai, Andheri, Vikhroli, Ghatkopar."/>
+  <meta name="theme-color" content="#0b6b63"/>
+  <meta name="description" content="HomeCare Mumbai — Book specialist home healthcare: wound care, nursing, diagnostics, physiotherapy, doctor visits and video consultations across Mumbai."/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="HomeCare"/>
@@ -15,38 +15,29 @@
 
   <style>
     :root{
-      /* ── Primary: deep teal ── */
-      --tl7:#0a5c61; --tl6:#0d7377; --tl5:#14a085; --tl4:#1bb99a;
-      --tl1:#eaf6f4; --tl0:#f4faf9;
-      /* ── Accent: warm amber (hope, warmth) ── */
-      --am5:#d4891a; --am4:#e8a045; --am3:#f0c07a; --am1:#fdf6e8;
+      /* ── Primary: deep clinical teal (premium, calmer than before) ── */
+      --tl7:#073b3f; --tl6:#0b6b63; --tl5:#128f7a; --tl4:#1aa98f;
+      --tl1:#e6f3f0; --tl0:#f6faf8;
+      /* ── Accent: refined gold (used sparingly — price tags, reference codes) ── */
+      --am5:#a8710f; --am4:#c98a1e; --am3:#e3ad55; --am1:#fbf3e3;
       /* ── WhatsApp / Call ── */
-      --wa:#25D366; --bl:#1a6bbf;
-      /* ── Glass ── */
-      --glass:rgba(255,255,255,0.60); --gborder:rgba(255,255,255,0.80);
-      --gshadow:0 8px 32px rgba(13,115,119,0.10);
-      /* ── Surface & text ── */
-      --bg:#f4faf9; --t9:#1a2e2d; --t6:#3d6462; --t4:#7aa3a1;
+      --wa:#25D366; --bl:#1a5fa0;
+      /* ── Cards: solid, crisp — not translucent glass (reads better, more premium) ── */
+      --glass:#ffffff; --gborder:#e3ece9;
+      --gshadow:0 6px 24px rgba(9,60,56,.08);
+      /* ── Surface & text (raised contrast for easy reading) ── */
+      --bg:#f6faf8; --t9:#12211e; --t7:#24413c; --t6:#4c6d67; --t4:#7fa39c;
       --rxl:20px; --rlg:14px; --rmd:10px;
       /* ── Gradients ── */
-      --gmain:linear-gradient(135deg,#0d7377 0%,#14a085 45%,#1bb99a 100%);
-      --gbtn:linear-gradient(135deg,#0d7377,#14a085 60%,#1bb99a);
-      --gbtn-amber:linear-gradient(135deg,#d4891a,#e8a045);
+      --gmain:linear-gradient(135deg,#0b6b63 0%,#128f7a 55%,#1aa98f 100%);
+      --gbtn:linear-gradient(135deg,#0b6b63,#128f7a 60%,#1aa98f);
+      --gbtn-amber:linear-gradient(135deg,#a8710f,#c98a1e);
       --gwa:linear-gradient(135deg,#25D366,#128C7E);
-      --gcall:linear-gradient(135deg,#1a6bbf,#1558a0);
-      --ghero:linear-gradient(135deg,#0a5c61 0%,#0d7377 40%,#14a085 70%,#e8a045 100%);
+      --gcall:linear-gradient(135deg,#1a5fa0,#124879);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t9);min-height:100dvh;overflow-x:hidden}
-
-    /* ── BLOBS ── */
-    .bg-blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-    .blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:drift 12s ease-in-out infinite alternate}
-    .b1{width:400px;height:400px;background:#0d7377;top:-110px;right:-70px;animation-delay:0s}
-    .b2{width:300px;height:300px;background:#1bb99a;bottom:8%;left:-55px;animation-delay:-5s}
-    .b3{width:200px;height:200px;background:#e8a045;top:42%;right:8%;animation-delay:-3s}
-    @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(28px,18px) scale(1.07)}}
 
     /* ── LAYOUT ── */
     .app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
@@ -72,45 +63,48 @@
     }
     .logo-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;line-height:1.05;letter-spacing:-.3px}
     .logo-sub{font-size:9.5px;font-weight:500;color:var(--t6);letter-spacing:.04em}
-    .hdr-badge{background:var(--gr1);color:var(--gr6);border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10.5px;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap}
-    .pulse{width:7px;height:7px;background:var(--gr5);border-radius:50%;animation:pulse 1.6s ease infinite;flex-shrink:0}
+    .hdr-badge{background:var(--tl1);color:var(--tl7);border:1px solid var(--gborder);border-radius:20px;padding:4px 10px;font-size:10.5px;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap}
+    .pulse{width:7px;height:7px;background:var(--tl4);border-radius:50%;animation:pulse 1.6s ease infinite;flex-shrink:0}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 
     /* ── HERO ── */
     .hero{padding:22px 16px 16px}
     .hero-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(13,115,119,.10);border:1px solid rgba(13,115,119,.22);border-radius:20px;padding:4px 12px;margin-bottom:11px;font-size:11px;font-weight:600;color:var(--tl6)}
     .hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:27px;line-height:1.18;margin-bottom:8px}
-    .hero h1 span{background:var(--ghero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero h1 span{background:var(--gmain);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .hero p{font-size:13px;color:var(--t6);line-height:1.65;margin-bottom:18px}
 
     /* ── CTA ROW ── */
     .cta-row{display:flex;gap:8px}
-    .btn-wa,.btn-call,.btn-book{
+    .btn-book,.btn-contact{
       flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
-      font-weight:700;font-size:13.5px;padding:13px 10px;
+      font-weight:700;font-size:14px;padding:14px 10px;
       border-radius:var(--rlg);border:none;cursor:pointer;text-decoration:none;
       transition:transform .18s,box-shadow .18s;
     }
-    .btn-wa  {background:var(--gwa); color:#fff;box-shadow:0 6px 18px rgba(37,211,102,.32)}
-    .btn-call{background:var(--gcall);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.28)}
-    .btn-book{background:var(--gbtn); color:#fff;box-shadow:0 6px 18px rgba(13,115,119,.28)}
-    .btn-wa:active,.btn-call:active,.btn-book:active{transform:scale(.97)}
+    .btn-book{background:var(--gbtn); color:#fff;box-shadow:0 6px 18px rgba(11,107,99,.28)}
+    .btn-contact{background:#fff;color:var(--tl7);border:1.5px solid var(--gborder);box-shadow:0 2px 10px rgba(9,60,56,.06)}
+    .btn-book:active,.btn-contact:active{transform:scale(.97)}
 
     /* ── TRUST ── */
     .trust{margin:18px 16px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
     .trust-item{background:var(--glass);border:1.5px solid var(--gborder);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:var(--rlg);padding:11px 6px;text-align:center;box-shadow:var(--gshadow)}
-    .trust-n{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800;background:var(--ghero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .trust-n{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800;color:var(--tl6)}
     .trust-l{font-size:9px;color:var(--t6);margin-top:2px;font-weight:500;line-height:1.35}
 
     /* ── AREA STRIP ── */
-    .area-strip{margin:14px 16px 0;background:var(--glass);border:1.5px solid var(--gborder);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:var(--rlg);padding:10px 14px;box-shadow:var(--gshadow);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .area-label{font-size:10px;font-weight:700;color:var(--t6);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
-    .area-tags{display:flex;flex-wrap:wrap;gap:5px;flex:1}
-    .area-tag{background:rgba(13,115,119,.10);border:1px solid rgba(13,115,119,.22);border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:600;color:var(--tl6)}
+    .area-strip{margin:14px 16px 0;background:var(--glass);border:1.5px solid var(--gborder);border-radius:var(--rlg);padding:10px 14px;box-shadow:var(--gshadow);text-align:center}
+    .area-label{font-size:12px;font-weight:700;color:var(--tl6)}
 
     /* ── SECTION ── */
     .sec{padding:20px 16px 0}
     .sec-lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--t6);text-transform:uppercase;margin-bottom:12px}
+
+    /* ── SERVICE CATEGORY TABS ── */
+    .svc-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none}
+    .svc-tabs::-webkit-scrollbar{display:none}
+    .svc-tab{flex:0 0 auto;padding:9px 15px;border-radius:20px;border:1.5px solid var(--gborder);background:#fff;font-size:12.5px;font-weight:700;color:var(--t6);white-space:nowrap;cursor:pointer;transition:all .18s}
+    .svc-tab.active{background:var(--gmain);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(11,107,99,.28)}
 
     /* ── SERVICE CARDS ── */
     .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -144,7 +138,7 @@
     .clr-sel{background:none;border:none;cursor:pointer;color:var(--t4);font-size:18px;line-height:1}
 
     /* ── DIVIDER ── */
-    .div{height:1px;background:linear-gradient(to right,transparent,rgba(249,115,22,.2),rgba(74,222,128,.2),transparent);margin:20px 16px 0}
+    .div{height:1px;background:linear-gradient(to right,transparent,rgba(11,107,99,.25),rgba(201,138,30,.2),transparent);margin:20px 16px 0}
 
     /* ── HOW IT WORKS ── */
     .steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
@@ -152,29 +146,43 @@
     .step:last-child{padding-bottom:0}
     .step-ln{position:absolute;left:17px;top:38px;bottom:0;width:2px;background:linear-gradient(to bottom,rgba(13,115,119,.35),rgba(27,185,154,.25))}
     .step:last-child .step-ln{display:none}
-    .step-n{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--gmain);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(249,115,22,.3);position:relative;z-index:1}
+    .step-n{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:var(--gmain);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(11,107,99,.3);position:relative;z-index:1}
     .step-t{font-weight:700;font-size:13px;margin-bottom:2px}
     .step-d{font-size:11.5px;color:var(--t6);line-height:1.55}
+
+    /* ── PAY CARD ── */
+    .pay-card{margin:18px 16px 0;background:var(--glass);border:1.5px solid var(--gborder);border-radius:var(--rxl);padding:18px 16px;box-shadow:var(--gshadow)}
+    .pay-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:16px;margin-bottom:3px}
+    .pay-sub{font-size:12px;color:var(--t6);margin-bottom:14px;line-height:1.55}
+    .pay-body{display:flex;gap:14px;align-items:center}
+    .pay-qr{width:96px;height:96px;flex-shrink:0;border-radius:var(--rmd);border:1.5px dashed var(--gborder);display:flex;align-items:center;justify-content:center;background:var(--tl0);font-size:11px;color:var(--t4);text-align:center;padding:6px;overflow:hidden}
+    .pay-qr img{width:100%;height:100%;object-fit:contain}
+    .pay-vpa{flex:1;min-width:0}
+    .pay-vpa-lbl{font-size:10px;font-weight:700;color:var(--t6);letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+    .pay-vpa-id{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;color:var(--tl7);word-break:break-all}
+    .pay-name{font-size:11.5px;color:var(--t6);margin-top:2px}
+    .pay-apps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:14px}
+    .pay-app-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:var(--rmd);border:1.5px solid var(--gborder);background:#fff;font-size:10.5px;font-weight:600;color:var(--t7);text-decoration:none;transition:transform .18s}
+    .pay-app-btn:active{transform:scale(.96)}
+    .pay-app-ic{font-size:19px}
+    .pay-unavailable{font-size:12px;color:var(--t6);background:var(--tl0);border-radius:var(--rmd);padding:10px 12px;text-align:center}
 
     /* ── FORM CARD ── */
     .form-card{margin:18px 16px 0;background:var(--glass);border:1.5px solid var(--gborder);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--rxl);padding:18px 16px;box-shadow:var(--gshadow)}
     .form-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:17px;margin-bottom:3px}
     .form-sub{font-size:12px;color:var(--t6);margin-bottom:14px}
 
-    /* CTA strip inside form */
-    .form-cta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-    .fcta-wa,.fcta-call{display:flex;align-items:center;justify-content:center;gap:7px;font-weight:700;font-size:13px;padding:12px;border-radius:var(--rmd);border:none;cursor:pointer;text-decoration:none;transition:transform .18s}
-    .fcta-wa  {background:var(--gwa); color:#fff;box-shadow:0 4px 12px rgba(37,211,102,.28)}
-    .fcta-call{background:var(--gcall);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.24)}
-    .fcta-wa:active,.fcta-call:active{transform:scale(.97)}
+    /* Prefer-to-talk line inside form (replaces duplicate WA/Call buttons) */
+    .form-talk{font-size:12px;color:var(--t6);margin-bottom:14px;text-align:center}
+    .form-talk button{background:none;border:none;padding:0;color:var(--tl6);font-weight:700;font-size:12px;cursor:pointer;text-decoration:underline}
     .or-div{display:flex;align-items:center;gap:9px;margin-bottom:14px}
-    .or-div hr{flex:1;border:none;border-top:1px solid rgba(13,115,119,.15)}
+    .or-div hr{flex:1;border:none;border-top:1px solid var(--gborder)}
     .or-div span{font-size:10.5px;color:var(--t6);white-space:nowrap;font-weight:500}
 
     .fgrp{margin-bottom:12px}
     .flbl{display:block;font-size:11px;font-weight:600;color:var(--t6);margin-bottom:5px;letter-spacing:.03em}
     .finp,.fsel,.ftxt{
-      width:100%;background:rgba(255,255,255,.72);border:1.5px solid rgba(249,115,22,.18);
+      width:100%;background:#fff;border:1.5px solid var(--gborder);
       border-radius:var(--rmd);padding:11px 12px;font-size:13.5px;
       font-family:'Inter',sans-serif;color:var(--t9);outline:none;
       transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;
@@ -205,7 +213,7 @@
     .d-chip input:checked+label .dck::after{content:'✓'}
 
     /* File upload */
-    .fupzone{border:2px dashed rgba(13,115,119,.25);border-radius:var(--rlg);padding:16px;text-align:center;cursor:pointer;background:rgba(249,115,22,.03);transition:border-color .18s,background .18s;position:relative}
+    .fupzone{border:2px dashed var(--gborder);border-radius:var(--rlg);padding:16px;text-align:center;cursor:pointer;background:var(--tl0);transition:border-color .18s,background .18s;position:relative}
     .fupzone:hover,.fupzone.drag{border-color:var(--tl5);background:rgba(13,115,119,.07)}
     .fupzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
     .fup-ic{font-size:24px;margin-bottom:5px}
@@ -230,20 +238,38 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     /* ── FOOTER ── */
-    .ftr{margin-top:26px;padding:16px 16px 110px;text-align:center}
+    .ftr{margin-top:26px;padding:16px 16px 96px;text-align:center}
     .ftr-brand{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;margin-bottom:5px;display:flex;align-items:center;justify-content:center;gap:7px}
     .ftr-addr{font-size:11.5px;color:var(--t6);line-height:1.75;margin-bottom:10px}
     .ftr-links{display:flex;justify-content:center;gap:16px;margin-bottom:8px}
     .ftr-links a{font-size:12px;color:var(--tl6);text-decoration:none;font-weight:600}
     .ftr-copy{font-size:10px;color:var(--t4)}
 
-    /* ── STICKY ── */
-    .sticky{position:fixed;bottom:20px;right:14px;z-index:100;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
-    .stk-wa,.stk-call{width:52px;height:52px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.2);font-size:23px;transition:transform .18s}
-    .stk-wa  {background:var(--gwa); animation:float 3s ease-in-out infinite;box-shadow:0 6px 20px rgba(37,211,102,.4)}
-    .stk-call{background:var(--gcall);box-shadow:0 6px 20px rgba(37,99,235,.35)}
-    .stk-wa:active,.stk-call:active{transform:scale(.94);animation:none}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    /* ── BOTTOM NAVIGATION ── */
+    .bnav{
+      position:fixed;left:0;right:0;bottom:0;z-index:100;
+      max-width:480px;margin:0 auto;
+      background:#fff;border-top:1px solid var(--gborder);
+      box-shadow:0 -4px 20px rgba(9,60,56,.08);
+      display:flex;align-items:stretch;
+      padding-bottom:env(safe-area-inset-bottom,0);
+    }
+    .bnav-item{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+      padding:9px 2px 8px;background:none;border:none;cursor:pointer;text-decoration:none;
+      color:var(--t6);font-family:'Inter',sans-serif;transition:color .15s;
+    }
+    .bnav-ic{font-size:19px;line-height:1}
+    .bnav-lbl{font-size:9.5px;font-weight:600}
+    .bnav-item.active{color:var(--tl6)}
+    .bnav-item:active{transform:scale(.94)}
+    .bnav-book{position:relative;margin-top:-14px}
+    .bnav-book .bnav-ic{
+      width:44px;height:44px;border-radius:50%;background:var(--gbtn);color:#fff;
+      display:flex;align-items:center;justify-content:center;font-size:19px;
+      box-shadow:0 6px 16px rgba(11,107,99,.4);
+    }
+    .bnav-book .bnav-lbl{color:var(--tl6);font-weight:700}
 
     /* ── TOAST ── */
     .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:200;max-width:330px;width:calc(100% - 32px);background:#1a0a00;color:#fff;border-radius:var(--rlg);padding:12px 15px;font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(0,0,0,.25);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;opacity:0}
@@ -270,21 +296,15 @@
     .m-call{background:var(--gcall);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.24)}
     .m-close{display:block;text-align:center;color:var(--t6);font-size:13px;cursor:pointer;padding:9px;border:none;background:none;width:100%}
 
-    @media(prefers-reduced-motion:reduce){.blob,.stk-wa,.pulse{animation:none}}
+    @media(prefers-reduced-motion:reduce){.pulse{animation:none}}
   </style>
 </head>
 <body>
 
-<div class="bg-blobs" aria-hidden="true">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-</div>
-
 <div class="app">
 
   <!-- HEADER -->
-  <header class="hdr">
+  <header class="hdr" id="top">
     <div class="logo">
       <div class="logo-mark">
         <span class="logo-cross">
@@ -315,13 +335,8 @@
     <p>Book wound care, stoma support, nursing, diagnostics, physiotherapy and doctor home visits — from our specialist-supervised team across Mumbai.</p>
 
     <div class="cta-row">
-      <a href="https://wa.me/919930533988?text=Hi%20HomeCare%20Mumbai%2C%20I%20need%20to%20book%20a%20home%20care%20service"
-         target="_blank" rel="noopener" class="btn-wa">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </a>
-      <a href="tel:+918169865898" class="btn-call">📞 Call Us</a>
-      <button class="btn-book" onclick="scrollToForm()">📋 Book</button>
+      <button class="btn-book" onclick="scrollToForm()">📋 Book a Service</button>
+      <button class="btn-contact" onclick="openContact()">💬 Contact Us</button>
     </div>
   </section>
 
@@ -330,33 +345,43 @@
     <div class="trust-item"><div class="trust-n">500+</div><div class="trust-l">Patients Served</div></div>
     <div class="trust-item"><div class="trust-n">24hr</div><div class="trust-l">Response Time</div></div>
     <div class="trust-item"><div class="trust-n">4.9★</div><div class="trust-l">Family Rating</div></div>
-    <div class="trust-item"><div class="trust-n">10+</div><div class="trust-l">Services Offered</div></div>
+    <div class="trust-item"><div class="trust-n">12+</div><div class="trust-l">Services Offered</div></div>
   </div>
 
   <!-- AREA COVERAGE -->
   <div class="area-strip">
-    <div class="area-label">📍 We Serve</div>
-    <div class="area-tags">
-      <span class="area-tag">Powai</span>
-      <span class="area-tag">Andheri</span>
-      <span class="area-tag">Vikhroli</span>
-      <span class="area-tag">Ghatkopar</span>
-    </div>
+    <div class="area-label">📍 Serving Mumbai</div>
   </div>
 
   <!-- SERVICES -->
   <section class="sec" id="services">
-    <div class="sec-lbl">Our Services — Tap a card to book</div>
-    <div class="svc-grid">
+    <div class="sec-lbl">Our Services — Tap a category, then a card to book</div>
 
-      <!-- ROW 1: Entry points — Doctor + Diagnostics booking -->
+    <div class="svc-tabs" role="tablist">
+      <button type="button" class="svc-tab active" data-cat="doctor" onclick="selCat('doctor')">👨‍⚕️ Doctor Visits</button>
+      <button type="button" class="svc-tab" data-cat="nursing" onclick="selCat('nursing')">👩‍⚕️ Nursing &amp; Care</button>
+      <button type="button" class="svc-tab" data-cat="therapy" onclick="selCat('therapy')">🧪 Therapy &amp; Tests</button>
+    </div>
+
+    <!-- CATEGORY: DOCTOR VISITS -->
+    <div class="svc-grid" data-cat-panel="doctor">
       <div class="svc-card" data-service="Doctor Home Visit" data-icon="👨‍⚕️" onclick="selSvc(this)">
         <span class="svc-ic">👨‍⚕️</span>
-        <div class="svc-nm">Book Doctor at Home</div>
+        <div class="svc-nm">Doctor Home Visit</div>
         <div class="svc-ds">Specialist &amp; general physician visits, prescription &amp; review</div>
         <div class="svc-pr">From ₹800/visit</div>
       </div>
 
+      <div class="svc-card" data-service="Video Consultation (Specialist)" data-icon="💻" onclick="selSvc(this)">
+        <span class="svc-ic">💻</span>
+        <div class="svc-nm">Video Consultation</div>
+        <div class="svc-ds">Consult a specialist doctor by video call, no travel needed — prescription shared digitally</div>
+        <div class="svc-pr">From ₹500/consult</div>
+      </div>
+    </div>
+
+    <!-- CATEGORY: NURSING & CARE -->
+    <div class="svc-grid" data-cat-panel="nursing" style="display:none">
       <div class="svc-card" data-service="Home Nursing & Attendant" data-icon="👩‍⚕️" onclick="selSvc(this)" id="nursingCard">
         <span class="svc-ic">👩‍⚕️</span>
         <div class="svc-nm">Nursing &amp; Attendant</div>
@@ -364,7 +389,6 @@
         <div class="svc-pr">From ₹1,800 / 12 hrs</div>
       </div>
 
-      <!-- ROW 2: Surgical & wound care -->
       <div class="svc-card" data-service="Post-Surgery Recovery" data-icon="🔬" onclick="selSvc(this)">
         <span class="svc-ic">🔬</span>
         <div class="svc-nm">Post-Surgery Recovery</div>
@@ -379,7 +403,6 @@
         <div class="svc-pr">From ₹1,200/visit</div>
       </div>
 
-      <!-- ROW 3: Stoma + Feeding -->
       <div class="svc-card" data-service="Stoma Care" data-icon="🦠" onclick="selSvc(this)">
         <span class="svc-ic">🦠</span>
         <div class="svc-nm">Stoma Care</div>
@@ -394,7 +417,6 @@
         <div class="svc-pr">From ₹1,200/visit</div>
       </div>
 
-      <!-- ROW 4: Cancer + Bedridden -->
       <div class="svc-card" data-service="Cancer & Palliative Care" data-icon="🎗️" onclick="selSvc(this)">
         <span class="svc-ic">🎗️</span>
         <div class="svc-nm">Cancer &amp; Palliative</div>
@@ -408,8 +430,10 @@
         <div class="svc-ds">Full-time support, positioning, hygiene, pressure sore prevention</div>
         <div class="svc-pr">From ₹1,500/day</div>
       </div>
+    </div>
 
-      <!-- ROW 5: Physio (both) -->
+    <!-- CATEGORY: THERAPY & TESTS -->
+    <div class="svc-grid" data-cat-panel="therapy" style="display:none">
       <div class="svc-card" data-service="Neuro Rehab & Physiotherapy" data-icon="🧠" onclick="selSvc(this)">
         <span class="svc-ic">🧠</span>
         <div class="svc-nm">Neuro Rehab</div>
@@ -443,7 +467,6 @@
           <div class="svc-pr" style="margin-top:7px">From ₹300 · Reports same day</div>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -496,20 +519,32 @@
 
   <div class="div"></div>
 
+  <!-- PAY VIA UPI (for existing patients settling a visit) -->
+  <div class="pay-card" id="payCard">
+    <div class="pay-title">💳 Pay via UPI</div>
+    <div class="pay-sub">Already a patient with a visit to pay for? Scan or tap to pay directly — mention your reference number (e.g. HC-XXXXXX) in the app note.</div>
+    <div class="pay-body">
+      <div class="pay-qr" id="payQrBox">QR code coming soon</div>
+      <div class="pay-vpa">
+        <div class="pay-vpa-lbl">UPI ID</div>
+        <div class="pay-vpa-id" id="payVpaText">Not yet set up</div>
+        <div class="pay-name" id="payNameText"></div>
+      </div>
+    </div>
+    <div class="pay-apps" id="payAppsGrid" style="display:none">
+      <a class="pay-app-btn" id="payGpay" href="#"><span class="pay-app-ic">🟢</span>GPay</a>
+      <a class="pay-app-btn" id="payPhonepe" href="#"><span class="pay-app-ic">🟣</span>PhonePe</a>
+      <a class="pay-app-btn" id="payPaytm" href="#"><span class="pay-app-ic">🔵</span>Paytm</a>
+    </div>
+    <div class="pay-unavailable" id="payUnavailableMsg">Online UPI payment is being set up. For now, please pay via WhatsApp/Call coordination — <button type="button" onclick="openContact()" style="background:none;border:none;color:var(--tl6);font-weight:700;cursor:pointer;text-decoration:underline;font-size:12px">Contact us</button>.</div>
+  </div>
+
   <!-- BOOKING FORM -->
   <div class="form-card" id="bookingForm">
     <div class="form-title">📋 Book a Service</div>
-    <div class="form-sub">We'll confirm within 2–4 hours. Prefer to talk?</div>
+    <div class="form-sub">We'll confirm within 2–4 hours.</div>
 
-    <!-- QUICK CTA -->
-    <div class="form-cta">
-      <a href="https://wa.me/919930533988?text=Hi%20HomeCare%20Mumbai%2C%20I%20want%20to%20book%20home%20healthcare"
-         target="_blank" rel="noopener" class="fcta-wa">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp Us
-      </a>
-      <a href="tel:+918169865898" class="fcta-call">📞 Call Now</a>
-    </div>
+    <div class="form-talk">Prefer to talk instead? <button type="button" onclick="openContact()">Contact us directly</button></div>
     <div class="or-div"><hr/><span>or fill the form below</span><hr/></div>
 
     <form id="theForm" novalidate>
@@ -529,7 +564,8 @@
         <label class="flbl" for="fservice">Service Required *</label>
         <select class="fsel" id="fservice" name="service" required onchange="onSvcChange(this.value)">
           <option value="">— Select a service —</option>
-          <option value="Doctor Home Visit">👨‍⚕️ Book Doctor at Home</option>
+          <option value="Doctor Home Visit">👨‍⚕️ Doctor Home Visit</option>
+          <option value="Video Consultation (Specialist)">💻 Video Consultation (Specialist)</option>
           <option value="Home Nursing & Attendant">👩‍⚕️ Home Nursing &amp; Attendant</option>
           <option value="Post-Surgery Recovery">🔬 Post-Surgery Recovery</option>
           <option value="Wound & VAC Care">🩹 Wound &amp; VAC Care</option>
@@ -606,15 +642,8 @@
       </div>
 
       <div class="fgrp">
-        <label class="flbl" for="farea">Area *</label>
-        <select class="fsel" id="farea" name="area" required>
-          <option value="">— Select your area —</option>
-          <option value="Powai">Powai</option>
-          <option value="Andheri">Andheri</option>
-          <option value="Vikhroli">Vikhroli</option>
-          <option value="Ghatkopar">Ghatkopar</option>
-          <option value="Other Mumbai">Other (Mumbai)</option>
-        </select>
+        <label class="flbl" for="farea">Area / Locality (Mumbai) *</label>
+        <input class="finp" type="text" id="farea" name="area" placeholder="e.g. Powai, Bandra, Thane…" autocomplete="address-level2" required/>
       </div>
 
       <div class="fgrp">
@@ -637,6 +666,13 @@
           <div class="fup-hint">Photos · PDFs · Discharge summary · X-rays · Word docs · Max 10 MB each</div>
         </div>
         <div class="flist" id="fileList"></div>
+        <div class="fup-hint" style="margin-top:6px">Online upload isn't available yet — after submitting, please also send these files to us on WhatsApp.</div>
+      </div>
+
+      <!-- Honeypot — invisible to real users, catches basic bots. Do not remove. -->
+      <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+        <label for="fhp">Leave this field blank</label>
+        <input type="text" id="fhp" name="website" tabindex="-1" autocomplete="off"/>
       </div>
 
       <button type="submit" class="btn-submit" id="submitBtn">
@@ -655,25 +691,44 @@
     </div>
     <div class="ftr-addr">
       📍 Accura Diagnostics, Powai, Mumbai<br>
-      Serving: Powai · Andheri · Vikhroli · Ghatkopar<br>
+      Serving all of Mumbai<br>
       📞 +91 81698 65898 &nbsp;|&nbsp; +91 99305 33988
     </div>
     <div class="ftr-links">
-      <a href="https://wa.me/919930533988" target="_blank">WhatsApp</a>
-      <a href="tel:+918169865898">Call Us</a>
-      <a href="mailto:care@homecaremumbai.in">Email</a>
+      <a href="mailto:care@homecaremumbai.in">Email Us</a>
     </div>
     <div class="ftr-copy">© 2026 HomeCare Mumbai. All rights reserved.</div>
   </footer>
 
 </div><!-- /app -->
 
-<!-- STICKY -->
-<div class="sticky">
-  <a href="https://wa.me/919930533988?text=Hi%20HomeCare%20Mumbai%2C%20I%20need%20home%20healthcare" target="_blank" rel="noopener" class="stk-wa" aria-label="WhatsApp">
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <a href="tel:+918169865898" class="stk-call" aria-label="Call">📞</a>
+<!-- BOTTOM NAVIGATION -->
+<nav class="bnav" id="bnav" aria-label="Primary">
+  <a href="#top" class="bnav-item" data-target="top"><span class="bnav-ic">🏠</span><span class="bnav-lbl">Home</span></a>
+  <a href="#services" class="bnav-item" data-target="services"><span class="bnav-ic">🩺</span><span class="bnav-lbl">Services</span></a>
+  <button type="button" class="bnav-item bnav-book" data-target="bookingForm" onclick="scrollToForm()">
+    <span class="bnav-ic">📋</span><span class="bnav-lbl">Book</span>
+  </button>
+  <a href="#payCard" class="bnav-item" data-target="payCard"><span class="bnav-ic">💳</span><span class="bnav-lbl">Pay</span></a>
+  <button type="button" class="bnav-item" onclick="openContact()"><span class="bnav-ic">💬</span><span class="bnav-lbl">Contact</span></button>
+</nav>
+
+<!-- CONTACT SHEET -->
+<div class="moverlay" id="contactSheet" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <span class="m-ic">💬</span>
+    <div class="m-title">Contact HomeCare Mumbai</div>
+    <div class="m-msg">Choose WhatsApp or call us directly — our team responds fast.</div>
+    <div class="m-acts">
+      <a href="https://wa.me/919930533988?text=Hi%20HomeCare%20Mumbai%2C%20I%20need%20home%20healthcare" target="_blank" rel="noopener" class="m-wa">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <a href="tel:+918169865898" class="m-call">📞 Call Us</a>
+    </div>
+    <button class="m-close" onclick="closeContact()">Close</button>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -686,53 +741,49 @@
 <div class="moverlay" id="successModal" role="dialog" aria-modal="true">
   <div class="modal">
     <div class="mhandle"></div>
-    <span class="m-ic">🎉</span>
-    <div class="m-title">Booking Requested!</div>
+    <span class="m-ic" id="mIcon">🎉</span>
+    <div class="m-title" id="mTitle">Booking Requested!</div>
     <div class="m-msg" id="mMsg">Your care request has been received. We'll call you within 2–4 hours.</div>
-    <div class="m-ref">
+    <div class="m-ref" id="mRefBox">
       <div class="m-ref-lbl">REFERENCE NUMBER</div>
       <div class="m-ref-code" id="mRef">HC-XXXXXX</div>
     </div>
     <div class="m-acts">
       <a href="#" class="m-wa" id="mWaBtn" target="_blank">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
+        <span id="mWaLbl">WhatsApp</span>
       </a>
       <a href="tel:+918169865898" class="m-call">📞 Call Us</a>
     </div>
-    <button class="m-close" onclick="closeMod()">I'll wait for your call — Done</button>
+    <button class="m-close" onclick="closeMod()" id="mCloseBtn">I'll wait for your call — Done</button>
   </div>
 </div>
 
 <script>
 // ══════════════════════════════════════
-// APPWRITE CONFIG  ← replace YOUR_PROJECT_ID
+// BOOKING BACKEND
+// Bookings are saved server-side via a Netlify Function
+// (netlify/functions/create-booking.js), which is the only
+// part of this app that talks to Appwrite. No Appwrite
+// credentials of any kind exist in this browser code.
 // ══════════════════════════════════════
-const AW_ENDPOINT    = 'https://cloud.appwrite.io/v1';
-const AW_PROJECT_ID  = 'YOUR_PROJECT_ID';
-const AW_DATABASE_ID = 'homecare_db';
-const AW_COLLECTION  = 'bookings';
-const AW_BUCKET_ID   = 'care_files';
-const WA_NUM         = '919930533988';
-
-let aw_client, aw_db, aw_store, awReady = false;
-async function loadAW() {
-  if (awReady) return;
-  await new Promise((res,rej)=>{
-    const s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/appwrite@15/dist/iife/sdk.js';
-    s.onload=res; s.onerror=rej; document.head.appendChild(s);
-  });
-  aw_client = new Appwrite.Client().setEndpoint(AW_ENDPOINT).setProject(AW_PROJECT_ID);
-  aw_db     = new Appwrite.Databases(aw_client);
-  aw_store  = new Appwrite.Storage(aw_client);
-  awReady = true;
-}
+const BOOKING_ENDPOINT = '/.netlify/functions/create-booking';
+const WA_NUM            = '919930533988';
 
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
 let files = [];
+
+// ══════════════════════════════════════
+// SERVICE CATEGORY TABS
+// ══════════════════════════════════════
+function selCat(cat) {
+  document.querySelectorAll('.svc-tab').forEach(t=>t.classList.toggle('active', t.dataset.cat===cat));
+  document.querySelectorAll('[data-cat-panel]').forEach(p=>{
+    p.style.display = (p.dataset.catPanel===cat) ? '' : 'none';
+  });
+}
 
 // ══════════════════════════════════════
 // SERVICE CARDS
@@ -810,6 +861,7 @@ document.getElementById('theForm').addEventListener('submit',async function(e){
   const address = document.getElementById('faddress').value.trim();
   const notes   = document.getElementById('fnotes').value.trim();
   const time    = document.getElementById('ftime').value;
+  const honeypot= document.getElementById('fhp').value;
 
   if(!name)   {showToast('er','Please enter patient name');document.getElementById('fname').focus();return}
   if(!phone)  {showToast('er','Please enter mobile number');document.getElementById('fphone').focus();return}
@@ -819,66 +871,98 @@ document.getElementById('theForm').addEventListener('submit',async function(e){
 
   // collect extras
   let extras='';
+  let duration='';
   if(service==='Home Nursing & Attendant'){
     const dur=document.querySelector('input[name=nd]:checked');
     const gen=document.querySelector('input[name=cg]:checked');
-    if(dur) extras+='Duration: '+dur.value+'. ';
-    if(gen) extras+='Caregiver: '+gen.value+'. ';
+    if(dur) duration=dur.value;
+    if(gen) extras+='Caregiver preference: '+gen.value+'. ';
   }
   if(service==='Diagnostics at Home'){
     const tests=[...document.querySelectorAll('input[name=diag]:checked')].map(c=>c.value);
-    if(tests.length) extras+='Tests: '+tests.join(', ')+'. ';
+    if(tests.length) extras+='Tests requested: '+tests.join(', ')+'. ';
   }
+  const combinedNotes=(notes+' '+extras).trim();
+  const fileCnt=files.length;
 
-  const ref='HC-'+Math.random().toString(36).substring(2,8).toUpperCase();
   btn.classList.add('ld'); btn.disabled=true;
 
-  try {
-    await loadAW();
-    const fids=[];
-    for(const f of files){
-      try{const r=await aw_store.createFile(AW_BUCKET_ID,Appwrite.ID.unique(),f);fids.push(r.$id)}
-      catch(fe){console.warn('file upload:',fe)}
-    }
-    await aw_db.createDocument(AW_DATABASE_ID,AW_COLLECTION,Appwrite.ID.unique(),{
-      reference_id:ref,patient_name:name,phone,service,preferred_date:date,
-      preferred_time:time||'Flexible',area,address,
-      notes:(notes+' '+extras).trim(),file_ids:fids.join(','),
-      status:'pending',submitted_at:new Date().toISOString()
+  let ref=null, ok=false;
+  try{
+    const resp=await fetch(BOOKING_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name,phone,service,date,time,area,address,
+        notes:combinedNotes,duration,website:honeypot
+      })
     });
-    finishBooking(ref,name,phone,service,date,time,area,address,notes,extras,fids.length);
+    const result=await resp.json().catch(()=>({}));
+    if(resp.ok && result && result.success && result.reference_code){
+      ref=result.reference_code; ok=true;
+    }
   }catch(err){
-    console.error(err);
-    // Fallback — works even without Appwrite configured
-    finishBooking(ref,name,phone,service,date,time,area,address,notes,extras,0);
+    console.error('booking submit failed:',err);
   }finally{
     btn.classList.remove('ld'); btn.disabled=false;
   }
+
+  if(ok){
+    finishBooking(ref,name,phone,service,date,time,area,address,combinedNotes,fileCnt);
+  }else{
+    // Never show a false success. Be honest, and offer the WhatsApp fallback
+    // with the full booking details so nothing the patient typed is lost.
+    failBooking(name,phone,service,date,time,area,address,combinedNotes,fileCnt);
+  }
 });
 
-function finishBooking(ref,name,phone,service,date,time,area,address,notes,extras,fileCnt){
-  const waMsg=encodeURIComponent(
-    `Hi HomeCare Mumbai 👋\n\n*New Booking*\n📋 Ref: ${ref}\n`+
+function buildWaMsg(headerLine,name,phone,service,date,time,area,address,notes,fileCnt){
+  return encodeURIComponent(
+    `Hi HomeCare Mumbai 👋\n\n${headerLine}\n`+
     `👤 Patient: ${name}\n📞 Phone: ${phone}\n`+
     `🩺 Service: ${service}\n📍 Area: ${area} — ${address}\n`+
     `📅 Date: ${date}${time?' ('+time+')':''}\n`+
     (notes?`💬 ${notes}\n`:'')+
-    (extras?`ℹ️ ${extras}\n`:'')+
-    (fileCnt?`📎 ${fileCnt} file(s) attached\n`:'')+
+    (fileCnt?`📎 ${fileCnt} file(s) to send — attaching separately\n`:'')+
     `\nPlease confirm my appointment.`
   );
-  document.getElementById('mRef').textContent=ref;
-  document.getElementById('mMsg').textContent=`Hi ${name.split(' ')[0]}! Your request for "${service}" on ${date} in ${area} is received. We'll call ${phone} within 2–4 hours.`;
-  document.getElementById('mWaBtn').href=`https://wa.me/${WA_NUM}?text=${waMsg}`;
-  showMod();
+}
+
+function resetFormUI(){
   document.getElementById('theForm').reset();
   files=[]; renderFiles();
   document.querySelectorAll('.svc-card').forEach(c=>c.classList.remove('sel'));
   document.getElementById('selBanner').classList.remove('on');
   document.querySelectorAll('.cpanel').forEach(p=>p.classList.remove('on'));
-  // restore date
   const d=new Date(); d.setDate(d.getDate()+1);
   document.getElementById('fdate').value=d.toISOString().split('T')[0];
+}
+
+function finishBooking(ref,name,phone,service,date,time,area,address,notes,fileCnt){
+  const waMsg=buildWaMsg('*New Booking* (confirmed online ✅)\n📋 Ref: '+ref,name,phone,service,date,time,area,address,notes,fileCnt);
+  document.getElementById('mIcon').textContent='🎉';
+  document.getElementById('mTitle').textContent='Booking Requested!';
+  document.getElementById('mRefBox').style.display='';
+  document.getElementById('mRef').textContent=ref;
+  document.getElementById('mMsg').textContent=`Hi ${name.split(' ')[0]}! Your request for "${service}" on ${date} in ${area} is received. We'll call ${phone} within 2–4 hours.`+(fileCnt?' Please also send your attached file(s) via WhatsApp.':'');
+  document.getElementById('mWaLbl').textContent='WhatsApp';
+  document.getElementById('mWaBtn').href=`https://wa.me/${WA_NUM}?text=${waMsg}`;
+  document.getElementById('mCloseBtn').textContent="I'll wait for your call — Done";
+  showMod();
+  resetFormUI();
+}
+
+function failBooking(name,phone,service,date,time,area,address,notes,fileCnt){
+  const waMsg=buildWaMsg('*Booking Request* (please confirm — online submission failed ⚠️)',name,phone,service,date,time,area,address,notes,fileCnt);
+  document.getElementById('mIcon').textContent='⚠️';
+  document.getElementById('mTitle').textContent="Couldn't submit online";
+  document.getElementById('mRefBox').style.display='none';
+  document.getElementById('mMsg').textContent="We're sorry — your request could not be saved online right now. Please tap WhatsApp or Call below so our team gets it directly. Nothing has been booked yet.";
+  document.getElementById('mWaLbl').textContent='Send via WhatsApp';
+  document.getElementById('mWaBtn').href=`https://wa.me/${WA_NUM}?text=${waMsg}`;
+  document.getElementById('mCloseBtn').textContent='Close';
+  showMod();
+  // Do not reset the form on failure — let the patient retry without retyping.
 }
 
 // ══════════════════════════════════════
@@ -887,6 +971,56 @@ function finishBooking(ref,name,phone,service,date,time,area,address,notes,extra
 function showMod(){document.getElementById('successModal').classList.add('on');document.body.style.overflow='hidden'}
 function closeMod(){document.getElementById('successModal').classList.remove('on');document.body.style.overflow=''}
 document.getElementById('successModal').addEventListener('click',function(e){if(e.target===this)closeMod()});
+
+// ══════════════════════════════════════
+// CONTACT SHEET (single reusable WhatsApp/Call chooser —
+// replaces the old repeated floating buttons + duplicate CTAs)
+// ══════════════════════════════════════
+function openContact(){document.getElementById('contactSheet').classList.add('on');document.body.style.overflow='hidden'}
+function closeContact(){document.getElementById('contactSheet').classList.remove('on');document.body.style.overflow=''}
+document.getElementById('contactSheet').addEventListener('click',function(e){if(e.target===this)closeContact()});
+
+// ══════════════════════════════════════
+// BOTTOM NAV — active-section highlighting
+// ══════════════════════════════════════
+(function(){
+  const items=[...document.querySelectorAll('.bnav-item[data-target]')];
+  const map={};
+  items.forEach(it=>{const t=document.getElementById(it.dataset.target); if(t) map[it.dataset.target]=it});
+  const targets=Object.keys(map).map(id=>document.getElementById(id)).filter(Boolean);
+  if(!targets.length || !('IntersectionObserver' in window)) return;
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        items.forEach(it=>it.classList.remove('active'));
+        const el=map[en.target.id]; if(el) el.classList.add('active');
+      }
+    });
+  },{rootMargin:'-40% 0px -50% 0px',threshold:0});
+  targets.forEach(t=>obs.observe(t));
+})();
+
+// ══════════════════════════════════════
+// PAY VIA UPI
+// Set your real UPI ID below. Until you do, the payment
+// buttons stay hidden and visitors see a safe fallback message —
+// this never shows a fake/placeholder UPI ID to a real patient.
+// ══════════════════════════════════════
+const UPI_ID = '';           // e.g. 'homecaremumbai@okaxis'
+const UPI_PAYEE_NAME = 'HomeCare Mumbai';
+(function(){
+  if(!UPI_ID) return; // stays on the safe "coming soon" fallback
+  const upiLink = amt => `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&cu=INR`;
+  document.getElementById('payVpaText').textContent = UPI_ID;
+  document.getElementById('payNameText').textContent = UPI_PAYEE_NAME;
+  document.getElementById('payGpay').href = upiLink();
+  document.getElementById('payPhonepe').href = upiLink();
+  document.getElementById('payPaytm').href = upiLink();
+  document.getElementById('payAppsGrid').style.display = '';
+  document.getElementById('payUnavailableMsg').style.display = 'none';
+  // QR image: replace payQrBox contents with an <img> once you provide the
+  // actual UPI QR code file (see the founder-facing setup note).
+})();
 
 // ══════════════════════════════════════
 // TOAST
