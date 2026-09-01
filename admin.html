@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>HomeCare Mumbai — Operations Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --tl7:#073b3f;--tl6:#0b6b63;--tl5:#128f7a;--tl1:#e6f3f0;--tl0:#f6faf8;
+    --am5:#a8710f;--am1:#fbf3e3;
+    --bg:#f6faf8;--card:#ffffff;--border:#e3ece9;
+    --t9:#12211e;--t7:#24413c;--t6:#4c6d67;--t4:#7fa39c;
+    --danger:#b3261e;--danger-bg:#fdecea;
+    --rlg:12px;--rmd:8px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t9);min-height:100vh}
+  .wrap{max-width:920px;margin:0 auto;padding:20px 16px 60px}
+
+  /* LOGIN */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .login-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 28px rgba(9,60,56,.10)}
+  .login-title{font-weight:800;font-size:20px;margin-bottom:4px}
+  .login-sub{font-size:13px;color:var(--t6);margin-bottom:20px}
+  .fgrp{margin-bottom:14px}
+  .flbl{display:block;font-size:12px;font-weight:600;color:var(--t6);margin-bottom:5px}
+  .finp{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:var(--rmd);padding:10px 12px;font-size:14px;font-family:inherit;color:var(--t9)}
+  .finp:focus{outline:none;border-color:var(--tl5);box-shadow:0 0 0 3px rgba(11,107,99,.12)}
+  .btn{background:var(--tl6);color:#fff;font-weight:700;font-size:14px;padding:11px;border-radius:var(--rmd);border:none;cursor:pointer;width:100%}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn:hover:not(:disabled){background:var(--tl7)}
+  .err-msg{background:var(--danger-bg);color:var(--danger);font-size:12.5px;padding:9px 11px;border-radius:var(--rmd);margin-bottom:14px;display:none}
+  .err-msg.on{display:block}
+
+  /* APP HEADER */
+  .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+  .hdr h1{font-size:19px;font-weight:800}
+  .hdr-sub{font-size:12px;color:var(--t6)}
+  .btn-ghost{background:none;border:1.5px solid var(--border);color:var(--t6);font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:20px;cursor:pointer}
+  .btn-ghost:hover{border-color:var(--tl5);color:var(--tl6)}
+
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .fsel{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--t7);font-family:inherit}
+  .count-pill{font-size:12px;color:var(--t6)}
+
+  /* VISIT LIST */
+  .visit-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rlg);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+  .visit-card:hover{border-color:var(--tl5)}
+  .vc-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
+  .vc-name{font-weight:700;font-size:14.5px}
+  .vc-ref{font-size:11px;color:var(--t4);font-weight:600}
+  .vc-line{font-size:12.5px;color:var(--t6);margin-top:2px}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .b-new_request{background:#fde8e8;color:#a02626}
+  .b-contacted{background:#fef3d6;color:#9a6a08}
+  .b-confirmed{background:#e2edfb;color:#1a4c8f}
+  .b-assigned{background:#e6e0fb;color:#4c2f9e}
+  .b-in_progress{background:#dff3ee;color:#0b6b63}
+  .b-completed{background:#e3f5e0;color:#2b7a1f}
+  .b-cancelled{background:#eee;color:#777}
+  .b-needs_replacement{background:#fde8e8;color:#a02626}
+  .concern-flag{color:var(--danger);font-weight:700;font-size:11px}
+
+  .empty-msg{text-align:center;color:var(--t6);font-size:13px;padding:40px 0}
+
+  /* DETAIL PANEL */
+  .overlay{position:fixed;inset:0;background:rgba(18,33,30,.45);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+  .overlay.on{opacity:1;pointer-events:all}
+  .panel{background:var(--bg);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:22px 20px 30px;transform:translateY(100%);transition:transform .3s}
+  .overlay.on .panel{transform:translateY(0)}
+  @media(min-width:640px){
+    .overlay{align-items:center}
+    .panel{border-radius:16px;max-height:85vh}
+  }
+  .panel h2{font-size:17px;font-weight:800;margin-bottom:2px}
+  .panel-sub{font-size:12px;color:var(--t6);margin-bottom:16px}
+  .info-block{background:var(--tl0);border-radius:var(--rmd);padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.7}
+  .info-block b{color:var(--t9)}
+  .ftxt{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:var(--rmd);padding:10px 12px;font-size:13.5px;font-family:inherit;resize:vertical;min-height:64px;color:var(--t9)}
+  .chk-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t7);margin-top:4px}
+  .panel-acts{display:flex;gap:8px;margin-top:18px}
+  .btn-secondary{flex:1;background:none;border:1.5px solid var(--border);color:var(--t7);font-weight:700;padding:11px;border-radius:var(--rmd);cursor:pointer}
+  .btn-save{flex:2}
+
+  .loading{text-align:center;padding:40px;color:var(--t6);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="login-title">HomeCare Mumbai</div>
+    <div class="login-sub">Operations Admin — private coordinator sign-in</div>
+    <div class="err-msg" id="loginErr"></div>
+    <form id="loginForm">
+      <div class="fgrp">
+        <label class="flbl" for="lemail">Email</label>
+        <input class="finp" type="email" id="lemail" required autocomplete="username"/>
+      </div>
+      <div class="fgrp">
+        <label class="flbl" for="lpass">Password</label>
+        <input class="finp" type="password" id="lpass" required autocomplete="current-password"/>
+      </div>
+      <button class="btn" type="submit" id="loginBtn">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- APP VIEW -->
+<div class="wrap" id="appView" style="display:none">
+  <div class="hdr">
+    <div>
+      <h1>Operations — Bookings</h1>
+      <div class="hdr-sub" id="whoami"></div>
+    </div>
+    <button class="btn-ghost" id="logoutBtn">Sign out</button>
+  </div>
+
+  <div class="filter-bar">
+    <select class="fsel" id="statusFilter">
+      <option value="">All statuses</option>
+      <option value="new_request">New Request</option>
+      <option value="contacted">Contacted</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="assigned">Assigned</option>
+      <option value="in_progress">In Progress</option>
+      <option value="completed">Completed</option>
+      <option value="needs_replacement">Needs Replacement</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+    <span class="count-pill" id="countPill"></span>
+    <button class="btn-ghost" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div id="listContainer"><div class="loading">Loading bookings…</div></div>
+</div>
+
+<!-- DETAIL / EDIT PANEL -->
+<div class="overlay" id="detailOverlay">
+  <div class="panel">
+    <h2 id="dName">—</h2>
+    <div class="panel-sub" id="dRef">—</div>
+    <div class="info-block" id="dInfo"></div>
+
+    <div class="fgrp">
+      <label class="flbl" for="dStatus">Status</label>
+      <select class="finp" id="dStatus">
+        <option value="new_request">New Request</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="assigned">Assigned</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="needs_replacement">Needs Replacement</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="fgrp">
+      <label class="flbl" for="dNotes">Coordinator Notes</label>
+      <textarea class="ftxt" id="dNotes" placeholder="e.g. Called patient, quoted ₹1500, confirmed for tomorrow 10am"></textarea>
+    </div>
+
+    <div class="fgrp">
+      <label class="flbl" for="dObs">Completion Observation (after visit)</label>
+      <textarea class="ftxt" id="dObs" placeholder="Short note from the provider after the visit"></textarea>
+    </div>
+
+    <div class="fgrp">
+      <label class="chk-row"><input type="checkbox" id="dConcern"/> Flag as concern / needs escalation</label>
+    </div>
+
+    <div class="err-msg" id="saveErr"></div>
+
+    <div class="panel-acts">
+      <button class="btn-secondary" id="cancelBtn">Cancel</button>
+      <button class="btn btn-save" id="saveBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0/dist/iife/sdk.js"></script>
+<script>
+// ══════════════════════════════════════
+// CONFIG — project id/endpoint are not secrets; no API key lives here.
+// Access is via each coordinator's own Appwrite login (email+password),
+// authorized by the "Users" role granted on the patients/visits tables.
+// ══════════════════════════════════════
+const AW_ENDPOINT = 'https://sgp.cloud.appwrite.io/v1';
+const AW_PROJECT  = '6a95aa00000e9fcbd0e6';
+const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients';
+
+const client = new Appwrite.Client().setEndpoint(AW_ENDPOINT).setProject(AW_PROJECT);
+const account = new Appwrite.Account(client);
+const tablesDB = new Appwrite.TablesDB(client);
+const Query = Appwrite.Query;
+
+let patientMap = {};   // patient_id -> patient row
+let visitsCache = [];  // last loaded visits
+let activeVisitId = null;
+
+function showErr(el, msg){ el.textContent = msg; el.classList.add('on'); }
+function clearErr(el){ el.textContent=''; el.classList.remove('on'); }
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+async function checkSession(){
+  try {
+    const user = await account.get();
+    document.getElementById('whoami').textContent = 'Signed in as ' + user.email;
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('appView').style.display = '';
+    loadAll();
+  } catch {
+    document.getElementById('loginView').style.display = '';
+    document.getElementById('appView').style.display = 'none';
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('loginErr');
+  clearErr(errEl);
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    await account.createEmailPasswordSession(
+      document.getElementById('lemail').value.trim(),
+      document.getElementById('lpass').value
+    );
+    await checkSession();
+  } catch (err) {
+    showErr(errEl, 'Sign-in failed: ' + (err.message || 'check your email/password.'));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  try { await account.deleteSession('current'); } catch {}
+  location.reload();
+});
+
+// ══════════════════════════════════════
+// DATA LOADING
+// ══════════════════════════════════════
+async function loadAll(){
+  document.getElementById('listContainer').innerHTML = '<div class="loading">Loading bookings…</div>';
+  try {
+    const [patientsRes, visitsRes] = await Promise.all([
+      tablesDB.listRows(DB_ID, PATIENTS, [Query.limit(200)]),
+      tablesDB.listRows(DB_ID, VISITS, [Query.orderDesc('$createdAt'), Query.limit(200)]),
+    ]);
+    patientMap = {};
+    patientsRes.rows.forEach(p => patientMap[p.$id] = p);
+    visitsCache = visitsRes.rows;
+    renderList();
+  } catch (err) {
+    document.getElementById('listContainer').innerHTML =
+      '<div class="empty-msg">Could not load bookings: ' + (err.message || 'unknown error') + '</div>';
+  }
+}
+
+function renderList(){
+  const filter = document.getElementById('statusFilter').value;
+  const filtered = filter ? visitsCache.filter(v => v.status === filter) : visitsCache;
+  document.getElementById('countPill').textContent = filtered.length + ' booking(s)';
+
+  const container = document.getElementById('listContainer');
+  if (!filtered.length){
+    container.innerHTML = '<div class="empty-msg">No bookings match this filter.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  filtered.forEach(v => {
+    const patient = patientMap[v.patient_id] || {};
+    const card = document.createElement('div');
+    card.className = 'visit-card';
+    card.onclick = () => openDetail(v.$id);
+    card.innerHTML = `
+      <div class="vc-top">
+        <div>
+          <div class="vc-name">${escapeHtml(patient.full_name || '(unknown patient)')}</div>
+          <div class="vc-line">${escapeHtml(v.service_type || '')} · ${escapeHtml(v.area || '')}</div>
+        </div>
+        <span class="badge b-${v.status}">${(v.status||'').replace('_',' ')}</span>
+      </div>
+      <div class="vc-line">${escapeHtml(patient.phone || '')} ${v.requested_date ? '· ' + v.requested_date.slice(0,10) : ''}</div>
+      <div class="vc-top" style="margin-top:6px;margin-bottom:0">
+        <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
+        ${v.concern_flag ? '<span class="concern-flag">⚠ CONCERN</span>' : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ══════════════════════════════════════
+// DETAIL / EDIT PANEL
+// ══════════════════════════════════════
+function openDetail(visitId){
+  const v = visitsCache.find(x => x.$id === visitId);
+  if (!v) return;
+  activeVisitId = visitId;
+  const patient = patientMap[v.patient_id] || {};
+
+  document.getElementById('dName').textContent = patient.full_name || '(unknown patient)';
+  document.getElementById('dRef').textContent = v.reference_code || '';
+  document.getElementById('dInfo').innerHTML = `
+    <div><b>Phone:</b> ${escapeHtml(patient.phone || '—')}</div>
+    <div><b>Address:</b> ${escapeHtml(patient.address || v.address || '—')}, ${escapeHtml(v.area || '')}</div>
+    <div><b>Service:</b> ${escapeHtml(v.service_type || '—')}</div>
+    <div><b>Requested:</b> ${v.requested_date ? v.requested_date.slice(0,10) : '—'} ${escapeHtml(v.requested_time_slot||'')}</div>
+    ${v.duration_or_frequency ? '<div><b>Duration:</b> ' + escapeHtml(v.duration_or_frequency) + '</div>' : ''}
+    ${v.request_notes ? '<div><b>Patient notes:</b> ' + escapeHtml(v.request_notes) + '</div>' : ''}
+    ${patient.brief_condition ? '<div><b>Condition:</b> ' + escapeHtml(patient.brief_condition) + '</div>' : ''}
+  `;
+  document.getElementById('dStatus').value = v.status || 'new_request';
+  document.getElementById('dNotes').value = v.coordinator_notes || '';
+  document.getElementById('dObs').value = v.completion_observation || '';
+  document.getElementById('dConcern').checked = !!v.concern_flag;
+  clearErr(document.getElementById('saveErr'));
+
+  document.getElementById('detailOverlay').classList.add('on');
+}
+
+function closeDetail(){
+  document.getElementById('detailOverlay').classList.remove('on');
+  activeVisitId = null;
+}
+document.getElementById('cancelBtn').addEventListener('click', closeDetail);
+document.getElementById('detailOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeDetail();
+});
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  if (!activeVisitId) return;
+  const errEl = document.getElementById('saveErr');
+  clearErr(errEl);
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await tablesDB.updateRow(DB_ID, VISITS, activeVisitId, {
+      status: document.getElementById('dStatus').value,
+      coordinator_notes: document.getElementById('dNotes').value.trim(),
+      completion_observation: document.getElementById('dObs').value.trim(),
+      concern_flag: document.getElementById('dConcern').checked,
+    });
+    closeDetail();
+    await loadAll();
+  } catch (err) {
+    showErr(errEl, 'Could not save: ' + (err.message || 'unknown error'));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+});
+
+document.getElementById('statusFilter').addEventListener('change', renderList);
+document.getElementById('refreshBtn').addEventListener('click', loadAll);
+
+checkSession();
+</script>
+</body>
+</html>

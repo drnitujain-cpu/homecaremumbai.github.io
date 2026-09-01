@@ -180,6 +180,25 @@ burden — it does not make judgment calls.
 - Every credential handoff happens via environment variables set directly in the user's own
   terminal or in the Netlify dashboard — never pasted into any chat.
 
+## 8a. Operations Admin app (`admin.html`) — live as of this build
+
+A separate, private page at `/admin.html` (linked from nowhere on the public site, not in
+its nav) gives the Operations Admin a real login and a list/edit view over `visits` (with
+patient info joined in for display). This is the first slice only:
+
+- **Auth**: Appwrite email/password sessions (`account.createEmailPasswordSession`) — no API
+  key of any kind in this page's code. Each coordinator needs their own Appwrite Auth user,
+  created manually in the Appwrite console (Auth → Create user).
+- **Access control**: the `patients` and `visits` tables have a table-level `Users` role
+  granted (Read/Create/Update) — any signed-in Appwrite user in this project can read/write
+  them. `Row security` is left OFF so this table-level grant applies uniformly. This is
+  intentionally coarse (fine for one coordinator) — if more than one Operations Admin account
+  is ever created, revisit whether finer-grained permissions are worth the added complexity.
+- **What it does today**: list all visits (newest first), filter by status, open one to edit
+  `status`, `coordinator_notes`, `completion_observation`, and `concern_flag`.
+- **What it does NOT do yet**: no providers, no assignment, no payments, no issues table —
+  those are later slices of this same milestone, added one at a time, not all at once.
+
 ## 9. Notification channels (coordinator-facing, free tier)
 
 The public website's booking function fires these alongside saving the request — best effort,
@@ -228,8 +247,9 @@ Premium-medical, not decorative: calm, high-contrast, uncluttered. Concretely �
    not install packages, without saying so first and getting confirmation.
 6. Keep the existing public website's design and working parts (WhatsApp, Call, layout)
    untouched unless a specific approved step requires changing them.
-6a. The site has a service worker (`sw.js`) that caches `index.html`/`manifest.json`
-    aggressively. **Bump its `CACHE` version string on every change to those two files** —
-    otherwise returning visitors stay stuck on the old cached version after a deploy.
+6a. The site has a service worker (`sw.js`) that caches pages aggressively (registered by
+    `index.html`, scope covers the whole site including `admin.html`). **Bump its `CACHE`
+    version string on every change to `index.html`, `admin.html`, or `manifest.json`** —
+    otherwise returning visitors/coordinators stay stuck on an old cached version after a deploy.
 7. Report plainly, in non-technical language: what was found, what was done, what still
    needs a human decision, and exactly one recommended next step — not a menu of options.
