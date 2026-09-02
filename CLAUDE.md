@@ -200,6 +200,9 @@ patient info joined in for display). This is the first slice only:
   provider profiles (`providers` table — full_name, phone, provider_type, skills,
   service_areas, availability_note, active_status, payout_rate_note). Same `Users`-role,
   no-row-security permission pattern as `patients`/`visits`.
+  A "✓ Mark Completed" quick action on each non-closed booking pre-sets status to
+  `completed` and focuses the observation field; saving with status `completed` and an
+  empty observation is blocked client-side (the short observation is required, per §4/§6).
 - **What it does NOT do yet**: no provider accept/decline flow, no payments, no issues
   table — those are later slices of this same milestone, added one at a time, not all at once.
 

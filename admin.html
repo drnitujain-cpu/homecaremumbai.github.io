@@ -64,6 +64,8 @@
   .b-cancelled{background:#eee;color:#777}
   .b-needs_replacement{background:#fde8e8;color:#a02626}
   .concern-flag{color:var(--danger);font-weight:700;font-size:11px}
+  .btn-complete{margin-top:10px;width:100%;background:none;border:1.5px solid var(--tl5);color:var(--tl6);font-weight:700;font-size:12px;padding:8px;border-radius:var(--rmd);cursor:pointer}
+  .btn-complete:hover{background:var(--tl1)}
 
   .empty-msg{text-align:center;color:var(--t6);font-size:13px;padding:40px 0}
 
@@ -409,12 +411,21 @@ function renderList(){
       </div>
       <div class="vc-line">${escapeHtml(patient.phone || '')} ${v.requested_date ? '· ' + v.requested_date.slice(0,10) : ''}</div>
       ${v.assigned_provider_id && providerMap[v.assigned_provider_id] ? '<div class="vc-line">👤 ' + escapeHtml(providerMap[v.assigned_provider_id].full_name) + '</div>' : ''}
+      ${v.status === 'completed' && v.completion_observation ? '<div class="vc-line">✓ ' + escapeHtml(v.completion_observation) + '</div>' : ''}
       <div class="vc-top" style="margin-top:6px;margin-bottom:0">
         <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
         ${v.concern_flag ? '<span class="concern-flag">⚠ CONCERN</span>' : ''}
       </div>
+      ${!['completed','cancelled'].includes(v.status) ? '<button type="button" class="btn-complete" data-visit="' + v.$id + '">✓ Mark Completed</button>' : ''}
     `;
     container.appendChild(card);
+    const completeBtn = card.querySelector('.btn-complete');
+    if (completeBtn){
+      completeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openDetail(v.$id, { quickComplete: true });
+      });
+    }
   });
 }
 
@@ -425,10 +436,11 @@ function escapeHtml(s){
 // ══════════════════════════════════════
 // DETAIL / EDIT PANEL
 // ══════════════════════════════════════
-function openDetail(visitId){
+function openDetail(visitId, opts){
   const v = visitsCache.find(x => x.$id === visitId);
   if (!v) return;
   activeVisitId = visitId;
+  opts = opts || {};
   const patient = patientMap[v.patient_id] || {};
 
   document.getElementById('dName').textContent = patient.full_name || '(unknown patient)';
@@ -447,13 +459,16 @@ function openDetail(visitId){
     providersCache.map(p => `<option value="${p.$id}">${escapeHtml(p.full_name)} (${escapeHtml(p.provider_type)})</option>`).join('');
   provSel.value = v.assigned_provider_id || '';
 
-  document.getElementById('dStatus').value = v.status || 'new_request';
+  document.getElementById('dStatus').value = opts.quickComplete ? 'completed' : (v.status || 'new_request');
   document.getElementById('dNotes').value = v.coordinator_notes || '';
   document.getElementById('dObs').value = v.completion_observation || '';
   document.getElementById('dConcern').checked = !!v.concern_flag;
   clearErr(document.getElementById('saveErr'));
 
   document.getElementById('detailOverlay').classList.add('on');
+  if (opts.quickComplete){
+    setTimeout(() => document.getElementById('dObs').focus(), 50);
+  }
 }
 
 function closeDetail(){
@@ -469,6 +484,15 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   if (!activeVisitId) return;
   const errEl = document.getElementById('saveErr');
   clearErr(errEl);
+
+  const status = document.getElementById('dStatus').value;
+  const observation = document.getElementById('dObs').value.trim();
+  if (status === 'completed' && !observation){
+    showErr(errEl, 'Please add a short observation before marking this visit completed.');
+    document.getElementById('dObs').focus();
+    return;
+  }
+
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
