@@ -219,6 +219,18 @@ patient info joined in for display). This is the first slice only:
   `wa.me` pre-filled — the coordinator still taps Send themselves. Nothing is sent
   automatically and no message content is stored; this is the same manual pattern already
   used on the public site, just reachable from the workflow instead of typed from scratch.
+- **Five tabs total**: Bookings, Providers, **Issues** (every issue across every visit, one
+  place, filterable by open/resolved, with patient/service context), **Payments** (every
+  payment record across every visit, filterable by patient payment status, with running
+  totals for receivable/payable and how much is still pending), and **Reports** (filter by
+  date range, provider, service, and area; shows matching bookings plus a summary — count,
+  total patient receivable, total provider payable, breakdown by status). Reports/Payments/
+  Issues are all computed client-side from data already loaded — no new backend calls.
+- **Delete** exists for Providers (in the edit panel, confirm-gated) and Issues (per item,
+  confirm-gated) — both need `delete` added to their table's "Users" permission in the
+  Appwrite console (a checkbox, no API key needed) or the delete call fails cleanly with an
+  error. **Bookings/patients are deliberately never hard-deletable** — "Cancelled" status is
+  the only way to remove one from active work, keeping patient history intact per §6.
 - **Provider confirmation**, tracked separately from the visit's main `status`
   (`provider_confirmation`: not_asked/awaiting_reply/accepted/declined) — set manually by
   the coordinator after getting the provider's WhatsApp reply. Shows as a badge on the

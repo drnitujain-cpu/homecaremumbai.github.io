@@ -88,6 +88,8 @@
   .issue-status-resolved{color:#2b7a1f;font-weight:700;font-size:11px}
   .issue-desc{color:var(--t6);margin-bottom:4px}
   .btn-resolve{background:none;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:600;color:var(--t7);cursor:pointer}
+  .btn-resolve.danger{color:var(--danger);border-color:var(--danger)}
+  .report-badges .badge{margin:0 6px 6px 0;display:inline-block}
   .issue-empty{font-size:12px;color:var(--t6);margin-bottom:10px}
 
   .empty-msg{text-align:center;color:var(--t6);font-size:13px;padding:40px 0}
@@ -161,9 +163,12 @@
     <button class="btn-ghost" id="logoutBtn">Sign out</button>
   </div>
 
-  <div class="tabbar">
+  <div class="tabbar" style="overflow-x:auto;flex-wrap:nowrap">
     <button class="tab-btn active" id="tabBookings" onclick="switchTab('bookings')">Bookings</button>
     <button class="tab-btn" id="tabProviders" onclick="switchTab('providers')">Providers</button>
+    <button class="tab-btn" id="tabIssues" onclick="switchTab('issues')">Issues</button>
+    <button class="tab-btn" id="tabPayments" onclick="switchTab('payments')">Payments</button>
+    <button class="tab-btn" id="tabReports" onclick="switchTab('reports')">Reports</button>
   </div>
 
   <!-- BOOKINGS TAB -->
@@ -193,6 +198,66 @@
       <button class="btn-add" onclick="openProviderDetail(null)">+ Add Provider</button>
     </div>
     <div id="providerListContainer"><div class="loading">Loading providers…</div></div>
+  </div>
+
+  <!-- ISSUES TAB -->
+  <div id="issuesTab" style="display:none">
+    <div class="filter-bar">
+      <select class="fsel" id="issueStatusFilter">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <span class="count-pill" id="issueCountPill"></span>
+    </div>
+    <div id="allIssuesContainer"><div class="loading">Loading issues…</div></div>
+  </div>
+
+  <!-- PAYMENTS TAB -->
+  <div id="paymentsTab" style="display:none">
+    <div class="filter-bar">
+      <select class="fsel" id="paymentStatusFilter">
+        <option value="">All patient statuses</option>
+        <option value="pending">Patient: Pending</option>
+        <option value="partial">Patient: Partial</option>
+        <option value="paid">Patient: Paid</option>
+      </select>
+      <span class="count-pill" id="paymentCountPill"></span>
+    </div>
+    <div id="paymentTotals"></div>
+    <div id="allPaymentsContainer"><div class="loading">Loading payments…</div></div>
+  </div>
+
+  <!-- REPORTS TAB -->
+  <div id="reportsTab" style="display:none">
+    <div class="pay-section">
+      <div class="pay-title">📊 Filters</div>
+      <div class="pay-row">
+        <div class="fgrp">
+          <label class="flbl" for="rFrom">From Date</label>
+          <input class="finp" type="date" id="rFrom"/>
+        </div>
+        <div class="fgrp">
+          <label class="flbl" for="rTo">To Date</label>
+          <input class="finp" type="date" id="rTo"/>
+        </div>
+      </div>
+      <div class="fgrp">
+        <label class="flbl" for="rProvider">Provider</label>
+        <select class="finp" id="rProvider"><option value="">All Providers</option></select>
+      </div>
+      <div class="fgrp">
+        <label class="flbl" for="rService">Service</label>
+        <select class="finp" id="rService"><option value="">All Services</option></select>
+      </div>
+      <div class="fgrp">
+        <label class="flbl" for="rArea">Area</label>
+        <select class="finp" id="rArea"><option value="">All Areas</option></select>
+      </div>
+      <button type="button" class="btn" id="runReportBtn">Run Report</button>
+    </div>
+    <div id="reportSummary"></div>
+    <div id="reportList"></div>
   </div>
 </div>
 
@@ -370,6 +435,8 @@
 
     <div class="err-msg" id="providerErr"></div>
 
+    <button type="button" class="btn-secondary" id="providerDeleteBtn" style="display:none;width:100%;color:var(--danger);border-color:var(--danger);margin-bottom:8px">🗑 Delete Provider</button>
+
     <div class="panel-acts">
       <button class="btn-secondary" id="providerCancelBtn">Cancel</button>
       <button class="btn btn-save" id="providerSaveBtn">Save Provider</button>
@@ -406,11 +473,15 @@ let activeProviderId = null; // null = creating a new provider
 // ══════════════════════════════════════
 // TABS
 // ══════════════════════════════════════
+const TABS = ['bookings', 'providers', 'issues', 'payments', 'reports'];
 function switchTab(which){
-  document.getElementById('tabBookings').classList.toggle('active', which==='bookings');
-  document.getElementById('tabProviders').classList.toggle('active', which==='providers');
-  document.getElementById('bookingsTab').style.display = which==='bookings' ? '' : 'none';
-  document.getElementById('providersTab').style.display = which==='providers' ? '' : 'none';
+  TABS.forEach(t => {
+    document.getElementById('tab' + t[0].toUpperCase() + t.slice(1)).classList.toggle('active', which === t);
+    document.getElementById(t + 'Tab').style.display = which === t ? '' : 'none';
+  });
+  if (which === 'issues') renderAllIssues();
+  if (which === 'payments') renderAllPayments();
+  if (which === 'reports') populateReportFilters();
 }
 
 function showErr(el, msg){ el.textContent = msg; el.classList.add('on'); }
@@ -733,6 +804,147 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
 document.getElementById('statusFilter').addEventListener('change', renderList);
 document.getElementById('refreshBtn').addEventListener('click', loadAll);
+document.getElementById('issueStatusFilter').addEventListener('change', renderAllIssues);
+document.getElementById('paymentStatusFilter').addEventListener('change', renderAllPayments);
+
+// ══════════════════════════════════════
+// PAYMENTS TAB — all payment records across every visit
+// ══════════════════════════════════════
+function renderAllPayments(){
+  const filter = document.getElementById('paymentStatusFilter').value;
+  const all = Object.values(paymentsByVisit);
+  const filtered = filter ? all.filter(p => p.patient_payment_status === filter) : all;
+  document.getElementById('paymentCountPill').textContent = filtered.length + ' payment record(s)';
+
+  const container = document.getElementById('allPaymentsContainer');
+  if (!filtered.length){
+    container.innerHTML = '<div class="empty-msg">No payment records match this filter.</div>';
+    renderPaymentTotals([]);
+    return;
+  }
+  container.innerHTML = '';
+  filtered.forEach(pay => {
+    const v = visitsCache.find(x => x.$id === pay.visit_id);
+    const patient = v ? (patientMap[v.patient_id] || {}) : {};
+    const provider = v && v.assigned_provider_id ? providerMap[v.assigned_provider_id] : null;
+    const card = document.createElement('div');
+    card.className = 'visit-card';
+    card.onclick = () => { if (v) { switchTab('bookings'); openDetail(v.$id); } };
+    card.innerHTML = `
+      <div class="vc-top">
+        <div>
+          <div class="vc-name">${escapeHtml(patient.full_name || '(unknown patient)')}</div>
+          <div class="vc-line">${escapeHtml(v?.service_type || '')} · ${escapeHtml(v?.reference_code || '')}</div>
+        </div>
+      </div>
+      <div class="pc-tags" style="margin-top:6px">
+        <span class="pay-badge pay-${pay.patient_payment_status}">Patient ₹${pay.patient_receivable_amount || 0}: ${pay.patient_payment_status}</span>
+        <span class="pay-badge pay-${pay.provider_payment_status}">${provider ? escapeHtml(provider.full_name) + ' ' : ''}₹${pay.provider_payable_amount || 0}: ${pay.provider_payment_status}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  renderPaymentTotals(filtered);
+}
+
+function renderPaymentTotals(list){
+  const totalReceivable = list.reduce((s, p) => s + (p.patient_receivable_amount || 0), 0);
+  const totalPayable = list.reduce((s, p) => s + (p.provider_payable_amount || 0), 0);
+  const pendingReceivable = list.filter(p => p.patient_payment_status !== 'paid').reduce((s, p) => s + (p.patient_receivable_amount || 0), 0);
+  const pendingPayable = list.filter(p => p.provider_payment_status !== 'paid').reduce((s, p) => s + (p.provider_payable_amount || 0), 0);
+  document.getElementById('paymentTotals').innerHTML = `
+    <div class="pay-section">
+      <div class="pay-title">Totals for this filter</div>
+      <div>💰 Patient receivable: ₹${totalReceivable} (₹${pendingReceivable} still pending)</div>
+      <div>💰 Provider payable: ₹${totalPayable} (₹${pendingPayable} still pending)</div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════
+// REPORTS TAB — filter by date range, provider, service, area
+// ══════════════════════════════════════
+function populateReportFilters(){
+  const provSel = document.getElementById('rProvider');
+  const currentProv = provSel.value;
+  provSel.innerHTML = '<option value="">All Providers</option>' +
+    providersCache.map(p => `<option value="${p.$id}">${escapeHtml(p.full_name)}</option>`).join('');
+  provSel.value = currentProv;
+
+  const serviceSel = document.getElementById('rService');
+  const currentService = serviceSel.value;
+  const services = [...new Set(visitsCache.map(v => v.service_type).filter(Boolean))].sort();
+  serviceSel.innerHTML = '<option value="">All Services</option>' +
+    services.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  serviceSel.value = currentService;
+
+  const areaSel = document.getElementById('rArea');
+  const currentArea = areaSel.value;
+  const areas = [...new Set(visitsCache.map(v => v.area).filter(Boolean))].sort();
+  areaSel.innerHTML = '<option value="">All Areas</option>' +
+    areas.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+  areaSel.value = currentArea;
+}
+
+function runReport(){
+  const from = document.getElementById('rFrom').value;
+  const to = document.getElementById('rTo').value;
+  const provider = document.getElementById('rProvider').value;
+  const service = document.getElementById('rService').value;
+  const area = document.getElementById('rArea').value;
+
+  const filtered = visitsCache.filter(v => {
+    const d = v.requested_date ? v.requested_date.slice(0, 10) : '';
+    if (from && (!d || d < from)) return false;
+    if (to && (!d || d > to)) return false;
+    if (provider && v.assigned_provider_id !== provider) return false;
+    if (service && v.service_type !== service) return false;
+    if (area && v.area !== area) return false;
+    return true;
+  });
+
+  const totalReceivable = filtered.reduce((s, v) => s + (paymentsByVisit[v.$id]?.patient_receivable_amount || 0), 0);
+  const totalPayable = filtered.reduce((s, v) => s + (paymentsByVisit[v.$id]?.provider_payable_amount || 0), 0);
+  const byStatus = {};
+  filtered.forEach(v => { byStatus[v.status] = (byStatus[v.status] || 0) + 1; });
+
+  document.getElementById('reportSummary').innerHTML = `
+    <div class="pay-section">
+      <div class="pay-title">Summary — ${filtered.length} booking(s)</div>
+      <div>💰 Total patient receivable: ₹${totalReceivable}</div>
+      <div>💰 Total provider payable: ₹${totalPayable}</div>
+      <div class="report-badges" style="margin-top:8px">
+        ${Object.entries(byStatus).map(([s, c]) => `<span class="badge b-${s}">${(STATUS_LABELS[s] || s)}: ${c}</span>`).join('')}
+      </div>
+    </div>
+  `;
+
+  const container = document.getElementById('reportList');
+  if (!filtered.length){
+    container.innerHTML = '<div class="empty-msg">No bookings match these filters.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  [...filtered].sort((a, b) => new Date(b.$createdAt || 0) - new Date(a.$createdAt || 0)).forEach(v => {
+    const patient = patientMap[v.patient_id] || {};
+    const provider = v.assigned_provider_id ? providerMap[v.assigned_provider_id] : null;
+    const card = document.createElement('div');
+    card.className = 'visit-card';
+    card.onclick = () => { switchTab('bookings'); openDetail(v.$id); };
+    card.innerHTML = `
+      <div class="vc-top">
+        <div>
+          <div class="vc-name">${escapeHtml(patient.full_name || '(unknown patient)')}</div>
+          <div class="vc-line">${escapeHtml(v.service_type || '')} · ${escapeHtml(v.area || '')}${provider ? ' · ' + escapeHtml(provider.full_name) : ''}</div>
+        </div>
+        <span class="badge b-${v.status}">${(v.status || '').replace('_', ' ')}</span>
+      </div>
+      <div class="vc-line">${v.requested_date ? v.requested_date.slice(0, 10) : ''} · ${escapeHtml(v.reference_code || '')}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+document.getElementById('runReportBtn').addEventListener('click', runReport);
 
 // ══════════════════════════════════════
 // ISSUES / CONCERNS — many per visit
@@ -741,6 +953,28 @@ const ISSUE_TYPE_LABELS = {
   clinical_concern: 'Clinical concern', service_complaint: 'Service complaint',
   late_or_no_show: 'Late / no-show', payment_issue: 'Payment issue', other: 'Other',
 };
+
+function issueItemInner(iss){
+  return `
+    <div class="issue-item-top">
+      <span class="issue-type-lbl">${ISSUE_TYPE_LABELS[iss.issue_type] || iss.issue_type}</span>
+      <span class="issue-status-${iss.status}">${iss.status}</span>
+    </div>
+    ${iss.description ? '<div class="issue-desc">' + escapeHtml(iss.description) + '</div>' : ''}
+    <div class="issue-desc">Raised by: ${escapeHtml(iss.raised_by || '')}</div>
+    <div style="display:flex;gap:6px;margin-top:4px">
+      ${iss.status === 'open' ? '<button type="button" class="btn-resolve" data-act="resolve">Mark Resolved</button>' : ''}
+      <button type="button" class="btn-resolve danger" data-act="delete">Delete</button>
+    </div>
+  `;
+}
+
+function wireIssueItemButtons(item, issueId, visitId, onChanged){
+  const resolveBtn = item.querySelector('[data-act="resolve"]');
+  if (resolveBtn) resolveBtn.addEventListener('click', () => resolveIssue(issueId, visitId, onChanged));
+  const deleteBtn = item.querySelector('[data-act="delete"]');
+  if (deleteBtn) deleteBtn.addEventListener('click', () => deleteIssue(issueId, visitId, onChanged));
+}
 
 function renderIssueList(visitId){
   const list = issuesByVisit[visitId] || [];
@@ -753,33 +987,60 @@ function renderIssueList(visitId){
   list.forEach(iss => {
     const item = document.createElement('div');
     item.className = 'issue-item';
-    item.innerHTML = `
-      <div class="issue-item-top">
-        <span class="issue-type-lbl">${ISSUE_TYPE_LABELS[iss.issue_type] || iss.issue_type}</span>
-        <span class="issue-status-${iss.status}">${iss.status}</span>
-      </div>
-      ${iss.description ? '<div class="issue-desc">' + escapeHtml(iss.description) + '</div>' : ''}
-      <div class="issue-desc">Raised by: ${escapeHtml(iss.raised_by || '')}</div>
-      ${iss.status === 'open' ? '<button type="button" class="btn-resolve" data-issue="' + iss.$id + '">Mark Resolved</button>' : ''}
-    `;
+    item.innerHTML = issueItemInner(iss);
     container.appendChild(item);
-    const resolveBtn = item.querySelector('.btn-resolve');
-    if (resolveBtn){
-      resolveBtn.addEventListener('click', () => resolveIssue(iss.$id, visitId));
-    }
+    wireIssueItemButtons(item, iss.$id, visitId, () => renderIssueList(visitId));
   });
 }
 
-async function resolveIssue(issueId, visitId){
+function renderAllIssues(){
+  const filter = document.getElementById('issueStatusFilter').value;
+  const all = Object.entries(issuesByVisit).flatMap(([visitId, arr]) => arr.map(iss => ({ iss, visitId })));
+  const filtered = filter ? all.filter(x => x.iss.status === filter) : all;
+  filtered.sort((a, b) => new Date(b.iss.$createdAt || 0) - new Date(a.iss.$createdAt || 0));
+  document.getElementById('issueCountPill').textContent = filtered.length + ' issue(s)';
+
+  const container = document.getElementById('allIssuesContainer');
+  if (!filtered.length){
+    container.innerHTML = '<div class="empty-msg">No issues match this filter.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  filtered.forEach(({ iss, visitId }) => {
+    const v = visitsCache.find(x => x.$id === visitId);
+    const patient = v ? (patientMap[v.patient_id] || {}) : {};
+    const item = document.createElement('div');
+    item.className = 'issue-item';
+    item.innerHTML =
+      `<div class="issue-desc" style="font-weight:700;color:var(--t9)">${escapeHtml(patient.full_name || '(unknown patient)')} · ${escapeHtml(v?.service_type || '')} · ${escapeHtml(v?.reference_code || '')}</div>` +
+      issueItemInner(iss);
+    container.appendChild(item);
+    wireIssueItemButtons(item, iss.$id, visitId, renderAllIssues);
+  });
+}
+
+async function resolveIssue(issueId, visitId, onChanged){
   try {
     await tablesDB.updateRow(DB_ID, ISSUES, issueId, { status: 'resolved' });
     const list = issuesByVisit[visitId] || [];
     const found = list.find(i => i.$id === issueId);
     if (found) found.status = 'resolved';
-    renderIssueList(visitId);
+    if (onChanged) onChanged();
     renderList();
   } catch (err) {
-    showErr(document.getElementById('issueErr'), 'Could not resolve: ' + (err.message || 'unknown error'));
+    alert('Could not resolve: ' + (err.message || 'unknown error'));
+  }
+}
+
+async function deleteIssue(issueId, visitId, onChanged){
+  if (!confirm('Delete this issue? This cannot be undone.')) return;
+  try {
+    await tablesDB.deleteRow(DB_ID, ISSUES, issueId);
+    issuesByVisit[visitId] = (issuesByVisit[visitId] || []).filter(i => i.$id !== issueId);
+    if (onChanged) onChanged();
+    renderList();
+  } catch (err) {
+    alert('Could not delete: ' + (err.message || 'unknown error'));
   }
 }
 
@@ -854,6 +1115,7 @@ function openProviderDetail(providerId){
   document.getElementById('pStatus').value = p?.active_status || 'pending_verification';
   document.getElementById('pRate').value = p?.payout_rate_note || '';
   clearErr(document.getElementById('providerErr'));
+  document.getElementById('providerDeleteBtn').style.display = providerId ? '' : 'none';
   document.getElementById('providerOverlay').classList.add('on');
 }
 
@@ -864,6 +1126,22 @@ function closeProviderDetail(){
 document.getElementById('providerCancelBtn').addEventListener('click', closeProviderDetail);
 document.getElementById('providerOverlay').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeProviderDetail();
+});
+
+document.getElementById('providerDeleteBtn').addEventListener('click', async () => {
+  if (!activeProviderId) return;
+  if (!confirm('Delete this provider? This cannot be undone. Any booking still assigned to them will keep showing their name until reassigned.')) return;
+  const btn = document.getElementById('providerDeleteBtn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    await tablesDB.deleteRow(DB_ID, PROVIDERS, activeProviderId);
+    closeProviderDetail();
+    await loadAll();
+  } catch (err) {
+    showErr(document.getElementById('providerErr'), 'Could not delete: ' + (err.message || 'unknown error'));
+  } finally {
+    btn.disabled = false; btn.textContent = '🗑 Delete Provider';
+  }
 });
 
 function splitTags(v){
