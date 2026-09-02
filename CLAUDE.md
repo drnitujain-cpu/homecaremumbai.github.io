@@ -103,7 +103,8 @@ Six tables/collections only. Do not add a table because it might be useful somed
    `requested_date` (optional), `requested_time_slot` (optional),
    `duration_or_frequency` (optional), `area`, `address`, `request_notes` (optional),
    `clinical_review_required` (boolean), `status`, `assigned_provider_id` (optional),
-   `coordinator_notes` (optional), `completion_observation` (optional),
+   `provider_confirmation` (`not_asked`/`awaiting_reply`/`accepted`/`declined`, default
+   `not_asked`), `coordinator_notes` (optional), `completion_observation` (optional),
    `concern_flag` (boolean), `next_visit_note` (optional), `created_at`, `updated_at`.
 
    Status values (only these): `new_request → contacted → confirmed → assigned →
@@ -212,8 +213,17 @@ patient info joined in for display). This is the first slice only:
   per open one, plus a small form to log a new issue immediately (its own action, not tied
   to the main Save Changes) — matches the `issues` table's one-to-many-per-visit shape
   from §5. Open-issue count shows as a badge on the booking card.
-- **What it does NOT do yet**: no provider accept/decline flow — that's the one remaining
-  piece from the original workflow, whenever it's worth adding.
+- **WhatsApp, manual-send, from inside the panel**: a "💬 Message Patient" button and a
+  "💬 Message Provider" button (shown once a provider is assigned) each build a message
+  from the visit's current state (service, date, assigned provider, amount due) and open
+  `wa.me` pre-filled — the coordinator still taps Send themselves. Nothing is sent
+  automatically and no message content is stored; this is the same manual pattern already
+  used on the public site, just reachable from the workflow instead of typed from scratch.
+- **Provider confirmation**, tracked separately from the visit's main `status`
+  (`provider_confirmation`: not_asked/awaiting_reply/accepted/declined) — set manually by
+  the coordinator after getting the provider's WhatsApp reply. Shows as a badge on the
+  booking card (a red "DECLINED" needs attention). This is the "provider accepts OR
+  coordinator records acceptance on provider's behalf" step from §4, now explicit.
 
 ## 8b. Provider onboarding page (`join.html`) — public, self-service
 

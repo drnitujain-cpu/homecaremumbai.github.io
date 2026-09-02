@@ -66,6 +66,8 @@
   .concern-flag{color:var(--danger);font-weight:700;font-size:11px}
   .btn-complete{margin-top:10px;width:100%;background:none;border:1.5px solid var(--tl5);color:var(--tl6);font-weight:700;font-size:12px;padding:8px;border-radius:var(--rmd);cursor:pointer}
   .btn-complete:hover{background:var(--tl1)}
+  .btn-wa-msg{width:100%;background:#e9f9ee;border:1.5px solid #25D366;color:#128C7E;font-weight:700;font-size:13px;padding:11px;border-radius:var(--rmd);cursor:pointer;margin-bottom:14px}
+  .btn-wa-msg:hover{background:#dcf5e3}
 
   /* PAYMENTS */
   .pay-section{background:var(--tl0);border-radius:var(--rmd);padding:14px;margin-bottom:14px}
@@ -201,12 +203,26 @@
     <div class="panel-sub" id="dRef">—</div>
     <div class="info-block" id="dInfo"></div>
 
+    <button type="button" class="btn-wa-msg" id="msgPatientBtn">💬 Message Patient on WhatsApp</button>
+
     <div class="fgrp">
       <label class="flbl" for="dProvider">Assigned Provider</label>
       <select class="finp" id="dProvider">
         <option value="">— Unassigned —</option>
       </select>
     </div>
+
+    <div class="fgrp" id="providerConfirmGrp" style="display:none">
+      <label class="flbl" for="dProviderConfirm">Provider Confirmation</label>
+      <select class="finp" id="dProviderConfirm">
+        <option value="not_asked">Not Asked Yet</option>
+        <option value="awaiting_reply">Awaiting Reply</option>
+        <option value="accepted">Accepted</option>
+        <option value="declined">Declined</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn-wa-msg" id="msgProviderBtn" style="display:none">💬 Message Provider on WhatsApp</button>
 
     <div class="fgrp">
       <label class="flbl" for="dStatus">Status</label>
@@ -500,7 +516,10 @@ function renderList(){
         <span class="badge b-${v.status}">${(v.status||'').replace('_',' ')}</span>
       </div>
       <div class="vc-line">${escapeHtml(patient.phone || '')} ${v.requested_date ? '· ' + v.requested_date.slice(0,10) : ''}</div>
-      ${v.assigned_provider_id && providerMap[v.assigned_provider_id] ? '<div class="vc-line">👤 ' + escapeHtml(providerMap[v.assigned_provider_id].full_name) + '</div>' : ''}
+      ${v.assigned_provider_id && providerMap[v.assigned_provider_id] ? '<div class="vc-line">👤 ' + escapeHtml(providerMap[v.assigned_provider_id].full_name) +
+        (v.provider_confirmation === 'declined' ? ' <span class="concern-flag">✗ DECLINED</span>' :
+         v.provider_confirmation === 'awaiting_reply' ? ' <span class="pay-badge pay-pending">awaiting reply</span>' :
+         v.provider_confirmation === 'accepted' ? ' <span class="pay-badge pay-paid">accepted</span>' : '') + '</div>' : ''}
       ${v.status === 'completed' && v.completion_observation ? '<div class="vc-line">✓ ' + escapeHtml(v.completion_observation) + '</div>' : ''}
       <div class="vc-top" style="margin-top:6px;margin-bottom:0">
         <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
@@ -529,6 +548,70 @@ function escapeHtml(s){
 }
 
 // ══════════════════════════════════════
+// WHATSAPP MESSAGES — manual send only. This builds the text and opens
+// wa.me with it pre-filled; a human still has to tap Send in WhatsApp.
+// No message is ever sent automatically, and nothing is stored about
+// what was sent — this is a convenience, not a communication log.
+// ══════════════════════════════════════
+const STATUS_LABELS = {
+  new_request: 'New Request', contacted: 'Contacted', confirmed: 'Confirmed',
+  assigned: 'Assigned', in_progress: 'In Progress', completed: 'Completed',
+  needs_replacement: 'Needs Replacement', cancelled: 'Cancelled',
+};
+
+function toWaNumber(phone){
+  let digits = String(phone || '').replace(/\D/g, '');
+  if (digits.length === 10) digits = '91' + digits; // assume India if no country code given
+  return digits;
+}
+
+function sendWaMessage(phone, text){
+  const num = toWaNumber(phone);
+  if (!num) { alert('No phone number on file to message.'); return; }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function buildPatientMessage(v, patient){
+  const provider = v.assigned_provider_id ? providerMap[v.assigned_provider_id] : null;
+  const payment = paymentsByVisit[v.$id];
+  const lines = [
+    `Hi ${(patient.full_name || '').split(' ')[0] || ''}, update on your HomeCare Mumbai booking (${v.reference_code || ''}):`,
+    `🩺 Service: ${v.service_type || ''}`,
+    v.requested_date ? `📅 Date: ${v.requested_date.slice(0,10)}${v.requested_time_slot ? ' (' + v.requested_time_slot + ')' : ''}` : '',
+    `📍 Status: ${STATUS_LABELS[v.status] || v.status || ''}`,
+    provider ? `👤 Provider: ${provider.full_name}` : '',
+    (payment && payment.patient_payment_status !== 'paid' && payment.patient_receivable_amount)
+      ? `💰 Amount due: ₹${payment.patient_receivable_amount} (${payment.patient_payment_status})` : '',
+    '',
+    '— HomeCare Mumbai',
+  ];
+  return lines.filter(Boolean).join('\n');
+}
+
+function buildProviderMessage(v, patient, provider){
+  const payment = paymentsByVisit[v.$id];
+  const lines = [
+    `Hi ${provider.full_name || ''}, you've been assigned a HomeCare Mumbai visit:`,
+    `👤 Patient: ${patient.full_name || ''}`,
+    `📍 ${patient.address || v.address || ''}, ${v.area || ''}`,
+    `🩺 Service: ${v.service_type || ''}`,
+    v.requested_date ? `📅 Date: ${v.requested_date.slice(0,10)}${v.requested_time_slot ? ' (' + v.requested_time_slot + ')' : ''}` : '',
+    v.duration_or_frequency ? `⏱ Duration: ${v.duration_or_frequency}` : '',
+    (payment && payment.provider_payable_amount) ? `💰 Payable: ₹${payment.provider_payable_amount} (${payment.provider_payment_status})` : '',
+    '',
+    'Please confirm you can attend.',
+    '— HomeCare Mumbai Coordinator',
+  ];
+  return lines.filter(Boolean).join('\n');
+}
+
+function refreshProviderConfirmUI(){
+  const hasProvider = !!document.getElementById('dProvider').value;
+  document.getElementById('providerConfirmGrp').style.display = hasProvider ? '' : 'none';
+  document.getElementById('msgProviderBtn').style.display = hasProvider ? '' : 'none';
+}
+
+// ══════════════════════════════════════
 // DETAIL / EDIT PANEL
 // ══════════════════════════════════════
 function openDetail(visitId, opts){
@@ -553,6 +636,15 @@ function openDetail(visitId, opts){
   provSel.innerHTML = '<option value="">— Unassigned —</option>' +
     providersCache.map(p => `<option value="${p.$id}">${escapeHtml(p.full_name)} (${escapeHtml(p.provider_type)})</option>`).join('');
   provSel.value = v.assigned_provider_id || '';
+  document.getElementById('dProviderConfirm').value = v.provider_confirmation || 'not_asked';
+  refreshProviderConfirmUI();
+  provSel.onchange = refreshProviderConfirmUI;
+
+  document.getElementById('msgPatientBtn').onclick = () => sendWaMessage(patient.phone, buildPatientMessage(v, patient));
+  document.getElementById('msgProviderBtn').onclick = () => {
+    const prov = providerMap[provSel.value];
+    if (prov) sendWaMessage(prov.phone, buildProviderMessage(v, patient, prov));
+  };
 
   document.getElementById('dStatus').value = opts.quickComplete ? 'completed' : (v.status || 'new_request');
   document.getElementById('dNotes').value = v.coordinator_notes || '';
@@ -609,6 +701,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   try {
     await tablesDB.updateRow(DB_ID, VISITS, activeVisitId, {
       assigned_provider_id: document.getElementById('dProvider').value,
+      provider_confirmation: document.getElementById('dProviderConfirm').value,
       status: document.getElementById('dStatus').value,
       coordinator_notes: document.getElementById('dNotes').value.trim(),
       completion_observation: document.getElementById('dObs').value.trim(),
