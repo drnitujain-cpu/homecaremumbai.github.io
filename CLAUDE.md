@@ -232,6 +232,10 @@ coordinator typing it in manually. Same safe pattern as the booking form:
 - `create-booking.js` and `create-provider.js` share their validation/notification helpers
   via `netlify/functions/_shared.js` (not a function itself — no `exports.handler`, so
   Netlify never treats it as its own endpoint).
+- Linked from the main site's footer ("Join Our Care Team") and discoverable by search
+  engines (no `noindex`) — deliberately promotable, since recruitment is a separate
+  audience from patients and doesn't touch the "no public marketplace" rule (that rule is
+  about *patients browsing/selecting providers*, not *providers applying to join*).
 
 ## 9. Notification channels (coordinator-facing, free tier)
 
