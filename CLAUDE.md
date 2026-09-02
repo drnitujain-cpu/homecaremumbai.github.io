@@ -203,8 +203,12 @@ patient info joined in for display). This is the first slice only:
   A "✓ Mark Completed" quick action on each non-closed booking pre-sets status to
   `completed` and focuses the observation field; saving with status `completed` and an
   empty observation is blocked client-side (the short observation is required, per §4/§6).
-- **What it does NOT do yet**: no provider accept/decline flow, no payments, no issues
-  table — those are later slices of this same milestone, added one at a time, not all at once.
+  A **Payments** block inside the same detail panel edits the visit's one `payments` row
+  (created on first save if it doesn't exist yet) — patient receivable amount + status
+  (pending/partial/paid) and provider payable amount + status (pending/paid), kept as
+  separate fields per §5. Payment status shows as badges on each booking card.
+- **What it does NOT do yet**: no provider accept/decline flow, no issues table — later
+  slices of this same milestone, added one at a time, not all at once.
 
 ## 9. Notification channels (coordinator-facing, free tier)
 

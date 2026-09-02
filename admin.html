@@ -67,6 +67,15 @@
   .btn-complete{margin-top:10px;width:100%;background:none;border:1.5px solid var(--tl5);color:var(--tl6);font-weight:700;font-size:12px;padding:8px;border-radius:var(--rmd);cursor:pointer}
   .btn-complete:hover{background:var(--tl1)}
 
+  /* PAYMENTS */
+  .pay-section{background:var(--tl0);border-radius:var(--rmd);padding:14px;margin-bottom:14px}
+  .pay-title{font-weight:700;font-size:13px;margin-bottom:10px}
+  .pay-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pay-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .pay-pending{background:#fef3d6;color:#9a6a08}
+  .pay-partial{background:#e2edfb;color:#1a4c8f}
+  .pay-paid{background:#e3f5e0;color:#2b7a1f}
+
   .empty-msg{text-align:center;color:var(--t6);font-size:13px;padding:40px 0}
 
   /* DETAIL PANEL */
@@ -215,6 +224,41 @@
       <label class="chk-row"><input type="checkbox" id="dConcern"/> Flag as concern / needs escalation</label>
     </div>
 
+    <div class="pay-section">
+      <div class="pay-title">💰 Payments</div>
+      <div class="pay-row">
+        <div class="fgrp">
+          <label class="flbl" for="dPatientAmt">Patient Owes (₹)</label>
+          <input class="finp" type="number" id="dPatientAmt" min="0" step="1"/>
+        </div>
+        <div class="fgrp">
+          <label class="flbl" for="dPatientStatus">Patient Payment</label>
+          <select class="finp" id="dPatientStatus">
+            <option value="pending">Pending</option>
+            <option value="partial">Partial</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+      <div class="pay-row">
+        <div class="fgrp">
+          <label class="flbl" for="dProviderAmt">Provider Payable (₹)</label>
+          <input class="finp" type="number" id="dProviderAmt" min="0" step="1"/>
+        </div>
+        <div class="fgrp">
+          <label class="flbl" for="dProviderStatus">Provider Payment</label>
+          <select class="finp" id="dProviderStatus">
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgrp">
+        <label class="flbl" for="dPayNotes">Payment Notes</label>
+        <input class="finp" type="text" id="dPayNotes" placeholder="e.g. UPI, cash, paid on 5 Sep"/>
+      </div>
+    </div>
+
     <div class="err-msg" id="saveErr"></div>
 
     <div class="panel-acts">
@@ -291,7 +335,7 @@
 // ══════════════════════════════════════
 const AW_ENDPOINT = 'https://sgp.cloud.appwrite.io/v1';
 const AW_PROJECT  = '6a95aa00000e9fcbd0e6';
-const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients', PROVIDERS = 'providers';
+const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients', PROVIDERS = 'providers', PAYMENTS = 'payments';
 
 const client = new Appwrite.Client().setEndpoint(AW_ENDPOINT).setProject(AW_PROJECT);
 const account = new Appwrite.Account(client);
@@ -302,7 +346,9 @@ let patientMap = {};    // patient_id -> patient row
 let visitsCache = [];   // last loaded visits
 let providersCache = []; // last loaded providers
 let providerMap = {};   // provider_id -> provider row
+let paymentsByVisit = {}; // visit_id -> payment row
 let activeVisitId = null;
+let activePaymentId = null;  // the payment row's own $id for the open visit, if it exists yet
 let activeProviderId = null; // null = creating a new provider
 
 // ══════════════════════════════════════
@@ -365,10 +411,11 @@ async function loadAll(){
   document.getElementById('listContainer').innerHTML = '<div class="loading">Loading bookings…</div>';
   document.getElementById('providerListContainer').innerHTML = '<div class="loading">Loading providers…</div>';
   try {
-    const [patientsRes, visitsRes, providersRes] = await Promise.all([
+    const [patientsRes, visitsRes, providersRes, paymentsRes] = await Promise.all([
       tablesDB.listRows(DB_ID, PATIENTS, [Query.limit(200)]),
       tablesDB.listRows(DB_ID, VISITS, [Query.orderDesc('$createdAt'), Query.limit(200)]),
       tablesDB.listRows(DB_ID, PROVIDERS, [Query.limit(200)]),
+      tablesDB.listRows(DB_ID, PAYMENTS, [Query.limit(200)]),
     ]);
     patientMap = {};
     patientsRes.rows.forEach(p => patientMap[p.$id] = p);
@@ -376,6 +423,8 @@ async function loadAll(){
     providersCache = providersRes.rows;
     providerMap = {};
     providersCache.forEach(p => providerMap[p.$id] = p);
+    paymentsByVisit = {};
+    paymentsRes.rows.forEach(pay => paymentsByVisit[pay.visit_id] = pay);
     renderList();
     renderProviders();
   } catch (err) {
@@ -416,6 +465,10 @@ function renderList(){
         <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
         ${v.concern_flag ? '<span class="concern-flag">⚠ CONCERN</span>' : ''}
       </div>
+      ${paymentsByVisit[v.$id] ? `<div class="pc-tags" style="margin-top:6px">
+        <span class="pay-badge pay-${paymentsByVisit[v.$id].patient_payment_status}">Patient: ${paymentsByVisit[v.$id].patient_payment_status}</span>
+        <span class="pay-badge pay-${paymentsByVisit[v.$id].provider_payment_status}">Provider: ${paymentsByVisit[v.$id].provider_payment_status}</span>
+      </div>` : ''}
       ${!['completed','cancelled'].includes(v.status) ? '<button type="button" class="btn-complete" data-visit="' + v.$id + '">✓ Mark Completed</button>' : ''}
     `;
     container.appendChild(card);
@@ -463,6 +516,15 @@ function openDetail(visitId, opts){
   document.getElementById('dNotes').value = v.coordinator_notes || '';
   document.getElementById('dObs').value = v.completion_observation || '';
   document.getElementById('dConcern').checked = !!v.concern_flag;
+
+  const payment = paymentsByVisit[v.$id] || null;
+  activePaymentId = payment ? payment.$id : null;
+  document.getElementById('dPatientAmt').value = payment?.patient_receivable_amount ?? '';
+  document.getElementById('dPatientStatus').value = payment?.patient_payment_status || 'pending';
+  document.getElementById('dProviderAmt').value = payment?.provider_payable_amount ?? '';
+  document.getElementById('dProviderStatus').value = payment?.provider_payment_status || 'pending';
+  document.getElementById('dPayNotes').value = payment?.notes || '';
+
   clearErr(document.getElementById('saveErr'));
 
   document.getElementById('detailOverlay').classList.add('on');
@@ -474,6 +536,7 @@ function openDetail(visitId, opts){
 function closeDetail(){
   document.getElementById('detailOverlay').classList.remove('on');
   activeVisitId = null;
+  activePaymentId = null;
 }
 document.getElementById('cancelBtn').addEventListener('click', closeDetail);
 document.getElementById('detailOverlay').addEventListener('click', (e) => {
@@ -503,6 +566,21 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
       completion_observation: document.getElementById('dObs').value.trim(),
       concern_flag: document.getElementById('dConcern').checked,
     });
+
+    const paymentData = {
+      visit_id: activeVisitId,
+      patient_receivable_amount: parseFloat(document.getElementById('dPatientAmt').value) || 0,
+      patient_payment_status: document.getElementById('dPatientStatus').value,
+      provider_payable_amount: parseFloat(document.getElementById('dProviderAmt').value) || 0,
+      provider_payment_status: document.getElementById('dProviderStatus').value,
+      notes: document.getElementById('dPayNotes').value.trim(),
+    };
+    if (activePaymentId){
+      await tablesDB.updateRow(DB_ID, PAYMENTS, activePaymentId, paymentData);
+    } else {
+      await tablesDB.createRow(DB_ID, PAYMENTS, Appwrite.ID.unique(), paymentData);
+    }
+
     closeDetail();
     await loadAll();
   } catch (err) {
