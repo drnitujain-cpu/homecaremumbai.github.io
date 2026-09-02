@@ -220,14 +220,17 @@ patient info joined in for display). This is the first slice only:
   themselves. Nothing is sent automatically and no message content is stored; this is the
   same manual pattern already used on the public site, just reachable from the workflow
   instead of typed from scratch.
-- **Team summary notifications** (`netlify/functions/notify-team.js`, no Appwrite access at
-  all — it only relays to Telegram/email): fires automatically on every booking Save
-  (patient, provider, service, area, status, notes) and on every WhatsApp button tap
-  (a short "message opened" notice) — same shared Telegram/email channel as new-booking
-  alerts. This keeps a receptionist/coordinator and the admin/owner in the loop without
-  either needing to open the admin app themselves. If/when Receptionist and Admin become
-  genuinely separate people, give them a second Telegram bot/chat and extend
-  `notifyCoordinator` to fan out to both — no other change needed.
+- **No automatic Telegram alerts for status changes.** An earlier version of this file fired
+  a Telegram/email notice on every booking Save and every WhatsApp button tap
+  (`netlify/functions/notify-team.js`). The founder asked for that to be removed — too much
+  bot noise — so it's deleted. **Do not re-add automatic Telegram notifications for status
+  changes, assignments, or WhatsApp-button taps.** Telegram/email stays exactly as it was
+  originally: new booking created, new provider onboarding submitted. Nothing else.
+- **"📋 Send Summary to Team on WhatsApp"** button instead: builds the same kind of summary
+  (patient + phone, provider + phone, service, area, status, payment) and opens `wa.me` to
+  the coordinator's own number (`WA_NUM` in `admin.html`) — manual send, same as the other
+  two WhatsApp buttons. This is the founder's deliberate choice: status communication stays
+  manual-send; only new-booking/new-provider events get an automatic bot alert.
 - **Five tabs total**: Bookings, Providers, **Issues** (every issue across every visit, one
   place, filterable by open/resolved, with patient/service context), **Payments** (every
   payment record across every visit, filterable by patient payment status, with running
@@ -304,6 +307,21 @@ Premium-medical, not decorative: calm, high-contrast, uncluttered. Concretely �
   reusable "Contact" action sheet covers it.
 - Text contrast is a requirement, not a nice-to-have: body text must be easily readable in
   direct sunlight on a phone, since that's how most patients' families will read it.
+
+## 10a. A real incident, and the lesson from it
+
+Adding `provider_confirmation` as a **required** enum column with a default broke the public
+booking form for real: `create-booking.js` never set that field, and Appwrite does **not**
+auto-apply a column's default value to a required field on row creation (defaults only cover
+older rows that predate the column). Every booking silently failed at the visit-creation step
+until this was caught and fixed by explicitly setting `provider_confirmation: 'not_asked'` in
+`create-booking.js`. A real patient's booking was lost before this was noticed.
+
+**The rule going forward: whenever a new `required` column is added to `patients` or
+`visits`, immediately check whether `create-booking.js` (or any other code that creates a row
+in that table) needs to explicitly set it — do not assume a `default` covers it.** Prefer
+making new columns optional (`required: false`) unless there's a real reason they must always
+have a value; it's a smaller blast radius if something is missed.
 
 ## 11. Working process for any future session
 

@@ -155,6 +155,7 @@ exports.handler = async (event) => {
         clinical_review_required: false,
         status: 'new_request',
         concern_flag: false,
+        provider_confirmation: 'not_asked',
       };
       if (requested_date) visitData.requested_date = requested_date;
       if (requested_time_slot) visitData.requested_time_slot = requested_time_slot;
