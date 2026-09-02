@@ -195,9 +195,13 @@ patient info joined in for display). This is the first slice only:
   intentionally coarse (fine for one coordinator) — if more than one Operations Admin account
   is ever created, revisit whether finer-grained permissions are worth the added complexity.
 - **What it does today**: list all visits (newest first), filter by status, open one to edit
-  `status`, `coordinator_notes`, `completion_observation`, and `concern_flag`.
-- **What it does NOT do yet**: no providers, no assignment, no payments, no issues table —
-  those are later slices of this same milestone, added one at a time, not all at once.
+  `assigned_provider_id` (dropdown of providers), `status`, `coordinator_notes`,
+  `completion_observation`, and `concern_flag`. A **Providers** tab lists/creates/edits
+  provider profiles (`providers` table — full_name, phone, provider_type, skills,
+  service_areas, availability_note, active_status, payout_rate_note). Same `Users`-role,
+  no-row-security permission pattern as `patients`/`visits`.
+- **What it does NOT do yet**: no provider accept/decline flow, no payments, no issues
+  table — those are later slices of this same milestone, added one at a time, not all at once.
 
 ## 9. Notification channels (coordinator-facing, free tier)
 

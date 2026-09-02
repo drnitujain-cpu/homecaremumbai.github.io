@@ -87,6 +87,21 @@
   .btn-save{flex:2}
 
   .loading{text-align:center;padding:40px;color:var(--t6);font-size:13px}
+
+  /* TABS */
+  .tabbar{display:flex;gap:8px;margin-bottom:16px}
+  .tab-btn{background:none;border:1.5px solid var(--border);color:var(--t6);font-weight:700;font-size:13px;padding:8px 16px;border-radius:20px;cursor:pointer}
+  .tab-btn.active{background:var(--tl6);color:#fff;border-color:transparent}
+
+  /* PROVIDER LIST */
+  .provider-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rlg);padding:14px 16px;margin-bottom:10px;cursor:pointer}
+  .provider-card:hover{border-color:var(--tl5)}
+  .pc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .pc-tag{font-size:10.5px;font-weight:600;background:var(--tl1);color:var(--tl7);border-radius:20px;padding:2px 9px}
+  .b-active{background:#e3f5e0;color:#2b7a1f}
+  .b-inactive{background:#eee;color:#777}
+  .b-pending_verification{background:#fef3d6;color:#9a6a08}
+  .btn-add{background:var(--tl6);color:#fff;font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:20px;border:none;cursor:pointer}
 </style>
 </head>
 <body>
@@ -115,29 +130,45 @@
 <div class="wrap" id="appView" style="display:none">
   <div class="hdr">
     <div>
-      <h1>Operations — Bookings</h1>
+      <h1>Operations</h1>
       <div class="hdr-sub" id="whoami"></div>
     </div>
     <button class="btn-ghost" id="logoutBtn">Sign out</button>
   </div>
 
-  <div class="filter-bar">
-    <select class="fsel" id="statusFilter">
-      <option value="">All statuses</option>
-      <option value="new_request">New Request</option>
-      <option value="contacted">Contacted</option>
-      <option value="confirmed">Confirmed</option>
-      <option value="assigned">Assigned</option>
-      <option value="in_progress">In Progress</option>
-      <option value="completed">Completed</option>
-      <option value="needs_replacement">Needs Replacement</option>
-      <option value="cancelled">Cancelled</option>
-    </select>
-    <span class="count-pill" id="countPill"></span>
-    <button class="btn-ghost" id="refreshBtn">↻ Refresh</button>
+  <div class="tabbar">
+    <button class="tab-btn active" id="tabBookings" onclick="switchTab('bookings')">Bookings</button>
+    <button class="tab-btn" id="tabProviders" onclick="switchTab('providers')">Providers</button>
   </div>
 
-  <div id="listContainer"><div class="loading">Loading bookings…</div></div>
+  <!-- BOOKINGS TAB -->
+  <div id="bookingsTab">
+    <div class="filter-bar">
+      <select class="fsel" id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="new_request">New Request</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="assigned">Assigned</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="needs_replacement">Needs Replacement</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <span class="count-pill" id="countPill"></span>
+      <button class="btn-ghost" id="refreshBtn">↻ Refresh</button>
+    </div>
+    <div id="listContainer"><div class="loading">Loading bookings…</div></div>
+  </div>
+
+  <!-- PROVIDERS TAB -->
+  <div id="providersTab" style="display:none">
+    <div class="filter-bar">
+      <span class="count-pill" id="providerCountPill"></span>
+      <button class="btn-add" onclick="openProviderDetail(null)">+ Add Provider</button>
+    </div>
+    <div id="providerListContainer"><div class="loading">Loading providers…</div></div>
+  </div>
 </div>
 
 <!-- DETAIL / EDIT PANEL -->
@@ -146,6 +177,13 @@
     <h2 id="dName">—</h2>
     <div class="panel-sub" id="dRef">—</div>
     <div class="info-block" id="dInfo"></div>
+
+    <div class="fgrp">
+      <label class="flbl" for="dProvider">Assigned Provider</label>
+      <select class="finp" id="dProvider">
+        <option value="">— Unassigned —</option>
+      </select>
+    </div>
 
     <div class="fgrp">
       <label class="flbl" for="dStatus">Status</label>
@@ -184,6 +222,64 @@
   </div>
 </div>
 
+<!-- PROVIDER EDIT PANEL -->
+<div class="overlay" id="providerOverlay">
+  <div class="panel">
+    <h2 id="pTitle">Add Provider</h2>
+    <div class="panel-sub">Basic profile — skills and areas as comma-separated tags</div>
+
+    <div class="fgrp">
+      <label class="flbl" for="pName">Full Name *</label>
+      <input class="finp" type="text" id="pName" required/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pPhone">Mobile *</label>
+      <input class="finp" type="tel" id="pPhone" required/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pType">Provider Type *</label>
+      <select class="finp" id="pType">
+        <option value="nurse">Nurse</option>
+        <option value="doctor">Doctor</option>
+        <option value="physiotherapist">Physiotherapist</option>
+        <option value="wound_stoma_specialist">Wound / Stoma Specialist</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pSkills">Skills (comma-separated)</label>
+      <input class="finp" type="text" id="pSkills" placeholder="e.g. Wound Care, ICU, Diabetic Care"/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pAreas">Service Areas (comma-separated)</label>
+      <input class="finp" type="text" id="pAreas" placeholder="e.g. Powai, Andheri"/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pAvail">Availability Note</label>
+      <input class="finp" type="text" id="pAvail" placeholder="e.g. Mon-Sat, mornings preferred"/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pStatus">Active Status</label>
+      <select class="finp" id="pStatus">
+        <option value="pending_verification">Pending Verification</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="fgrp">
+      <label class="flbl" for="pRate">Payout Rate Note</label>
+      <input class="finp" type="text" id="pRate" placeholder="e.g. ₹800/visit, ₹1800/12hr shift"/>
+    </div>
+
+    <div class="err-msg" id="providerErr"></div>
+
+    <div class="panel-acts">
+      <button class="btn-secondary" id="providerCancelBtn">Cancel</button>
+      <button class="btn btn-save" id="providerSaveBtn">Save Provider</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0/dist/iife/sdk.js"></script>
 <script>
 // ══════════════════════════════════════
@@ -193,16 +289,29 @@
 // ══════════════════════════════════════
 const AW_ENDPOINT = 'https://sgp.cloud.appwrite.io/v1';
 const AW_PROJECT  = '6a95aa00000e9fcbd0e6';
-const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients';
+const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients', PROVIDERS = 'providers';
 
 const client = new Appwrite.Client().setEndpoint(AW_ENDPOINT).setProject(AW_PROJECT);
 const account = new Appwrite.Account(client);
 const tablesDB = new Appwrite.TablesDB(client);
 const Query = Appwrite.Query;
 
-let patientMap = {};   // patient_id -> patient row
-let visitsCache = [];  // last loaded visits
+let patientMap = {};    // patient_id -> patient row
+let visitsCache = [];   // last loaded visits
+let providersCache = []; // last loaded providers
+let providerMap = {};   // provider_id -> provider row
 let activeVisitId = null;
+let activeProviderId = null; // null = creating a new provider
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(which){
+  document.getElementById('tabBookings').classList.toggle('active', which==='bookings');
+  document.getElementById('tabProviders').classList.toggle('active', which==='providers');
+  document.getElementById('bookingsTab').style.display = which==='bookings' ? '' : 'none';
+  document.getElementById('providersTab').style.display = which==='providers' ? '' : 'none';
+}
 
 function showErr(el, msg){ el.textContent = msg; el.classList.add('on'); }
 function clearErr(el){ el.textContent=''; el.classList.remove('on'); }
@@ -252,18 +361,25 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // ══════════════════════════════════════
 async function loadAll(){
   document.getElementById('listContainer').innerHTML = '<div class="loading">Loading bookings…</div>';
+  document.getElementById('providerListContainer').innerHTML = '<div class="loading">Loading providers…</div>';
   try {
-    const [patientsRes, visitsRes] = await Promise.all([
+    const [patientsRes, visitsRes, providersRes] = await Promise.all([
       tablesDB.listRows(DB_ID, PATIENTS, [Query.limit(200)]),
       tablesDB.listRows(DB_ID, VISITS, [Query.orderDesc('$createdAt'), Query.limit(200)]),
+      tablesDB.listRows(DB_ID, PROVIDERS, [Query.limit(200)]),
     ]);
     patientMap = {};
     patientsRes.rows.forEach(p => patientMap[p.$id] = p);
     visitsCache = visitsRes.rows;
+    providersCache = providersRes.rows;
+    providerMap = {};
+    providersCache.forEach(p => providerMap[p.$id] = p);
     renderList();
+    renderProviders();
   } catch (err) {
-    document.getElementById('listContainer').innerHTML =
-      '<div class="empty-msg">Could not load bookings: ' + (err.message || 'unknown error') + '</div>';
+    const msg = '<div class="empty-msg">Could not load: ' + (err.message || 'unknown error') + '</div>';
+    document.getElementById('listContainer').innerHTML = msg;
+    document.getElementById('providerListContainer').innerHTML = msg;
   }
 }
 
@@ -292,6 +408,7 @@ function renderList(){
         <span class="badge b-${v.status}">${(v.status||'').replace('_',' ')}</span>
       </div>
       <div class="vc-line">${escapeHtml(patient.phone || '')} ${v.requested_date ? '· ' + v.requested_date.slice(0,10) : ''}</div>
+      ${v.assigned_provider_id && providerMap[v.assigned_provider_id] ? '<div class="vc-line">👤 ' + escapeHtml(providerMap[v.assigned_provider_id].full_name) + '</div>' : ''}
       <div class="vc-top" style="margin-top:6px;margin-bottom:0">
         <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
         ${v.concern_flag ? '<span class="concern-flag">⚠ CONCERN</span>' : ''}
@@ -325,6 +442,11 @@ function openDetail(visitId){
     ${v.request_notes ? '<div><b>Patient notes:</b> ' + escapeHtml(v.request_notes) + '</div>' : ''}
     ${patient.brief_condition ? '<div><b>Condition:</b> ' + escapeHtml(patient.brief_condition) + '</div>' : ''}
   `;
+  const provSel = document.getElementById('dProvider');
+  provSel.innerHTML = '<option value="">— Unassigned —</option>' +
+    providersCache.map(p => `<option value="${p.$id}">${escapeHtml(p.full_name)} (${escapeHtml(p.provider_type)})</option>`).join('');
+  provSel.value = v.assigned_provider_id || '';
+
   document.getElementById('dStatus').value = v.status || 'new_request';
   document.getElementById('dNotes').value = v.coordinator_notes || '';
   document.getElementById('dObs').value = v.completion_observation || '';
@@ -351,6 +473,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     await tablesDB.updateRow(DB_ID, VISITS, activeVisitId, {
+      assigned_provider_id: document.getElementById('dProvider').value,
       status: document.getElementById('dStatus').value,
       coordinator_notes: document.getElementById('dNotes').value.trim(),
       completion_observation: document.getElementById('dObs').value.trim(),
@@ -367,6 +490,102 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
 document.getElementById('statusFilter').addEventListener('change', renderList);
 document.getElementById('refreshBtn').addEventListener('click', loadAll);
+
+// ══════════════════════════════════════
+// PROVIDERS — list + create/edit
+// ══════════════════════════════════════
+function renderProviders(){
+  document.getElementById('providerCountPill').textContent = providersCache.length + ' provider(s)';
+  const container = document.getElementById('providerListContainer');
+  if (!providersCache.length){
+    container.innerHTML = '<div class="empty-msg">No providers yet. Tap "+ Add Provider" to add your first one.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  providersCache.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'provider-card';
+    card.onclick = () => openProviderDetail(p.$id);
+    card.innerHTML = `
+      <div class="vc-top">
+        <div>
+          <div class="vc-name">${escapeHtml(p.full_name)}</div>
+          <div class="vc-line">${escapeHtml(p.provider_type || '')} · ${escapeHtml(p.phone || '')}</div>
+        </div>
+        <span class="badge b-${p.active_status}">${(p.active_status||'').replace('_',' ')}</span>
+      </div>
+      <div class="pc-tags">
+        ${(p.skills||[]).map(s => '<span class="pc-tag">' + escapeHtml(s) + '</span>').join('')}
+        ${(p.service_areas||[]).map(a => '<span class="pc-tag">📍 ' + escapeHtml(a) + '</span>').join('')}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function openProviderDetail(providerId){
+  activeProviderId = providerId;
+  const p = providerId ? providersCache.find(x => x.$id === providerId) : null;
+  document.getElementById('pTitle').textContent = p ? 'Edit Provider' : 'Add Provider';
+  document.getElementById('pName').value = p?.full_name || '';
+  document.getElementById('pPhone').value = p?.phone || '';
+  document.getElementById('pType').value = p?.provider_type || 'nurse';
+  document.getElementById('pSkills').value = (p?.skills || []).join(', ');
+  document.getElementById('pAreas').value = (p?.service_areas || []).join(', ');
+  document.getElementById('pAvail').value = p?.availability_note || '';
+  document.getElementById('pStatus').value = p?.active_status || 'pending_verification';
+  document.getElementById('pRate').value = p?.payout_rate_note || '';
+  clearErr(document.getElementById('providerErr'));
+  document.getElementById('providerOverlay').classList.add('on');
+}
+
+function closeProviderDetail(){
+  document.getElementById('providerOverlay').classList.remove('on');
+  activeProviderId = null;
+}
+document.getElementById('providerCancelBtn').addEventListener('click', closeProviderDetail);
+document.getElementById('providerOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeProviderDetail();
+});
+
+function splitTags(v){
+  return v.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+document.getElementById('providerSaveBtn').addEventListener('click', async () => {
+  const errEl = document.getElementById('providerErr');
+  clearErr(errEl);
+  const full_name = document.getElementById('pName').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+  if (!full_name || !phone){
+    showErr(errEl, 'Name and mobile are required.');
+    return;
+  }
+  const btn = document.getElementById('providerSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const data = {
+    full_name, phone,
+    provider_type: document.getElementById('pType').value,
+    skills: splitTags(document.getElementById('pSkills').value),
+    service_areas: splitTags(document.getElementById('pAreas').value),
+    availability_note: document.getElementById('pAvail').value.trim(),
+    active_status: document.getElementById('pStatus').value,
+    payout_rate_note: document.getElementById('pRate').value.trim(),
+  };
+  try {
+    if (activeProviderId){
+      await tablesDB.updateRow(DB_ID, PROVIDERS, activeProviderId, data);
+    } else {
+      await tablesDB.createRow(DB_ID, PROVIDERS, Appwrite.ID.unique(), data);
+    }
+    closeProviderDetail();
+    await loadAll();
+  } catch (err) {
+    showErr(errEl, 'Could not save: ' + (err.message || 'unknown error'));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Provider';
+  }
+});
 
 checkSession();
 </script>
