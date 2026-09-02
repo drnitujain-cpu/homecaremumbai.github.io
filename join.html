@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#0b6b63"/>
+<meta name="robots" content="noindex, nofollow"/>
+<meta name="description" content="Join HomeCare Mumbai as a care provider — nurse, doctor, physiotherapist, or wound/stoma specialist."/>
+<title>Join HomeCare Mumbai — Provider Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --tl7:#073b3f;--tl6:#0b6b63;--tl5:#128f7a;--tl1:#e6f3f0;--tl0:#f6faf8;
+    --am5:#a8710f;
+    --wa:#25D366;--bl:#1a5fa0;
+    --glass:#ffffff;--gborder:#e3ece9;
+    --gshadow:0 6px 24px rgba(9,60,56,.08);
+    --bg:#f6faf8;--t9:#12211e;--t7:#24413c;--t6:#4c6d67;--t4:#7fa39c;
+    --rxl:20px;--rlg:14px;--rmd:10px;
+    --gmain:linear-gradient(135deg,#0b6b63 0%,#128f7a 55%,#1aa98f 100%);
+    --gwa:linear-gradient(135deg,#25D366,#128C7E);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t9);min-height:100dvh}
+  .app{max-width:480px;margin:0 auto;padding:0 0 40px}
+
+  .hdr{padding:20px 16px 0;display:flex;align-items:center;gap:9px}
+  .logo-mark{width:40px;height:40px;border-radius:12px;background:var(--gmain);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(11,107,99,.3)}
+  .logo-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px}
+  .logo-sub{font-size:9.5px;font-weight:500;color:var(--t6)}
+
+  .hero{padding:20px 16px 4px}
+  .hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.25;margin-bottom:8px}
+  .hero p{font-size:13px;color:var(--t6);line-height:1.6}
+
+  .form-card{margin:18px 16px 0;background:var(--glass);border:1.5px solid var(--gborder);border-radius:var(--rxl);padding:18px 16px;box-shadow:var(--gshadow)}
+  .fgrp{margin-bottom:14px}
+  .flbl{display:block;font-size:11px;font-weight:600;color:var(--t6);margin-bottom:5px;letter-spacing:.03em}
+  .finp{width:100%;background:#fff;border:1.5px solid var(--gborder);border-radius:var(--rmd);padding:11px 12px;font-size:13.5px;font-family:inherit;color:var(--t9);outline:none}
+  .finp:focus{border-color:var(--tl5);box-shadow:0 0 0 3px rgba(11,107,99,.12)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+  .btn-submit{width:100%;margin-top:4px;background:var(--gmain);color:#fff;font-weight:700;font-size:15px;padding:15px;border-radius:var(--rlg);border:none;cursor:pointer;box-shadow:0 6px 22px rgba(11,107,99,.28);display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-submit:disabled{opacity:.55;cursor:not-allowed}
+  .spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+  .btn-submit.ld .spinner{display:inline-block}
+  .btn-submit.ld .btxt{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .or-line{text-align:center;font-size:12px;color:var(--t6);margin:16px 0}
+  .wa-link{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gwa);color:#fff;font-weight:700;font-size:14px;padding:13px;border-radius:var(--rlg);text-decoration:none;margin:0 16px}
+
+  .err-msg{background:#fdecea;color:#b3261e;font-size:12.5px;padding:9px 11px;border-radius:var(--rmd);margin-bottom:14px;display:none}
+  .err-msg.on{display:block}
+
+  .moverlay{position:fixed;inset:0;z-index:150;background:rgba(18,33,30,.5);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .moverlay.on{opacity:1;pointer-events:all}
+  .modal{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:24px 20px 34px;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);text-align:center}
+  .moverlay.on .modal{transform:translateY(0)}
+  .m-ic{font-size:46px;display:block;margin-bottom:8px}
+  .m-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;margin-bottom:6px}
+  .m-msg{font-size:13px;color:var(--t6);line-height:1.6;margin-bottom:16px}
+  .m-close{background:var(--gmain);color:#fff;font-weight:700;font-size:14px;padding:12px 20px;border-radius:var(--rlg);border:none;cursor:pointer;width:100%}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="hdr">
+    <div class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><path d="M14 3L3 11.5V25H10.5V18H17.5V25H25V11.5L14 3Z" fill="white" opacity="0.95"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">HomeCare Mumbai</div>
+      <div class="logo-sub">Provider Onboarding</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Join our care provider network</h1>
+    <p>For nurses, doctors, physiotherapists, and wound/stoma specialists. Fill this in once — our coordinator will verify your details and reach out before assigning any visits.</p>
+  </section>
+
+  <div class="form-card">
+    <div class="err-msg" id="formErr"></div>
+    <form id="theForm" novalidate>
+      <div class="frow">
+        <div class="fgrp">
+          <label class="flbl" for="fname">Full Name *</label>
+          <input class="finp" type="text" id="fname" required autocomplete="name"/>
+        </div>
+        <div class="fgrp">
+          <label class="flbl" for="fphone">Mobile *</label>
+          <input class="finp" type="tel" id="fphone" required autocomplete="tel"/>
+        </div>
+      </div>
+
+      <div class="fgrp">
+        <label class="flbl" for="ftype">Provider Type *</label>
+        <select class="finp" id="ftype" required>
+          <option value="">— Select —</option>
+          <option value="nurse">Nurse</option>
+          <option value="doctor">Doctor</option>
+          <option value="physiotherapist">Physiotherapist</option>
+          <option value="wound_stoma_specialist">Wound / Stoma Specialist</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="fgrp">
+        <label class="flbl" for="fskills">Skills (comma-separated)</label>
+        <input class="finp" type="text" id="fskills" placeholder="e.g. Wound Care, ICU, Diabetic Care"/>
+      </div>
+
+      <div class="fgrp">
+        <label class="flbl" for="fareas">Areas You Can Serve (comma-separated)</label>
+        <input class="finp" type="text" id="fareas" placeholder="e.g. Powai, Andheri"/>
+      </div>
+
+      <div class="fgrp">
+        <label class="flbl" for="favail">Availability</label>
+        <input class="finp" type="text" id="favail" placeholder="e.g. Mon-Sat, mornings preferred"/>
+      </div>
+
+      <div class="fgrp">
+        <label class="flbl" for="frate">Expected Rate (optional)</label>
+        <input class="finp" type="text" id="frate" placeholder="e.g. ₹800/visit, ₹1800/12hr shift"/>
+      </div>
+
+      <!-- Honeypot — invisible to real users, catches basic bots. Do not remove. -->
+      <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+        <label for="fhp">Leave this field blank</label>
+        <input type="text" id="fhp" tabindex="-1" autocomplete="off"/>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btxt">Submit for Verification</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="or-line">or reach us directly</div>
+  <a href="https://wa.me/919930533988?text=Hi%2C%20I%27d%20like%20to%20join%20HomeCare%20Mumbai%20as%20a%20care%20provider" target="_blank" rel="noopener" class="wa-link">💬 WhatsApp Us</a>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="moverlay" id="resultModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <span class="m-ic" id="mIcon">🎉</span>
+    <div class="m-title" id="mTitle">Thanks for applying!</div>
+    <div class="m-msg" id="mMsg"></div>
+    <button class="m-close" id="mCloseBtn">Done</button>
+  </div>
+</div>
+
+<script>
+const SUBMIT_ENDPOINT = '/.netlify/functions/create-provider';
+const WA_NUM = '919930533988';
+
+function showErr(msg){
+  const el = document.getElementById('formErr');
+  el.textContent = msg; el.classList.add('on');
+}
+function clearErr(){
+  const el = document.getElementById('formErr');
+  el.textContent = ''; el.classList.remove('on');
+}
+
+document.getElementById('theForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearErr();
+  const name = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  const providerType = document.getElementById('ftype').value;
+  const skills = document.getElementById('fskills').value.trim();
+  const areas = document.getElementById('fareas').value.trim();
+  const availability = document.getElementById('favail').value.trim();
+  const rate = document.getElementById('frate').value.trim();
+  const honeypot = document.getElementById('fhp').value;
+
+  if (!name) { showErr('Please enter your name.'); document.getElementById('fname').focus(); return; }
+  if (!phone) { showErr('Please enter your mobile number.'); document.getElementById('fphone').focus(); return; }
+  if (!providerType) { showErr('Please select a provider type.'); document.getElementById('ftype').focus(); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('ld'); btn.disabled = true;
+
+  let ok = false, serverMsg = '';
+  try {
+    const resp = await fetch(SUBMIT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, providerType, skills, areas, availability, rate, website: honeypot }),
+    });
+    const result = await resp.json().catch(() => ({}));
+    ok = resp.ok && result && result.success;
+    serverMsg = result && result.message;
+  } catch (err) {
+    console.error('provider submit failed:', err);
+  } finally {
+    btn.classList.remove('ld'); btn.disabled = false;
+  }
+
+  if (ok) {
+    document.getElementById('mIcon').textContent = '🎉';
+    document.getElementById('mTitle').textContent = 'Thanks for applying!';
+    document.getElementById('mMsg').textContent = `Hi ${name.split(' ')[0]}, your details have been received. Our coordinator will verify and contact you before assigning any visits.`;
+    document.getElementById('theForm').reset();
+  } else {
+    // Never show a false success.
+    document.getElementById('mIcon').textContent = '⚠️';
+    document.getElementById('mTitle').textContent = "Couldn't submit online";
+    document.getElementById('mMsg').textContent = serverMsg || "We're sorry — something went wrong. Please use WhatsApp instead so we don't lose your details.";
+  }
+  document.getElementById('resultModal').classList.add('on');
+  document.body.style.overflow = 'hidden';
+});
+
+document.getElementById('mCloseBtn').addEventListener('click', () => {
+  document.getElementById('resultModal').classList.remove('on');
+  document.body.style.overflow = '';
+});
+document.getElementById('resultModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) document.getElementById('mCloseBtn').click();
+});
+</script>
+</body>
+</html>

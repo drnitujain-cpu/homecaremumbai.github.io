@@ -215,6 +215,24 @@ patient info joined in for display). This is the first slice only:
 - **What it does NOT do yet**: no provider accept/decline flow — that's the one remaining
   piece from the original workflow, whenever it's worth adding.
 
+## 8b. Provider onboarding page (`join.html`) — public, self-service
+
+A separate public page (not linked from the main site's nav — shared as a direct link, e.g.
+over WhatsApp) lets a prospective provider submit their own profile instead of the
+coordinator typing it in manually. Same safe pattern as the booking form:
+
+- Public page → `netlify/functions/create-provider.js` (validates input, honeypot, writes
+  with server-held credentials only) → `providers` table. No Appwrite credentials of any
+  kind in the page's own code.
+- Every self-submitted provider lands with `active_status: 'pending_verification'` —
+  never `active` — so a coordinator must manually verify and activate them in the
+  Operations Admin app (Providers tab) before they can be assigned any bookings.
+- Fires the same best-effort Telegram/email notification as a new booking, so the
+  coordinator knows to go verify someone new.
+- `create-booking.js` and `create-provider.js` share their validation/notification helpers
+  via `netlify/functions/_shared.js` (not a function itself — no `exports.handler`, so
+  Netlify never treats it as its own endpoint).
+
 ## 9. Notification channels (coordinator-facing, free tier)
 
 The public website's booking function fires these alongside saving the request — best effort,
