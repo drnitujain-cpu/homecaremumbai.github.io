@@ -76,6 +76,18 @@
   .pay-partial{background:#e2edfb;color:#1a4c8f}
   .pay-paid{background:#e3f5e0;color:#2b7a1f}
 
+  /* ISSUES */
+  .issue-section{background:var(--danger-bg);border-radius:var(--rmd);padding:14px;margin-bottom:14px}
+  .issue-add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  .issue-item{background:#fff;border:1px solid var(--border);border-radius:var(--rmd);padding:9px 11px;margin-bottom:8px;font-size:12.5px}
+  .issue-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+  .issue-type-lbl{font-weight:700;color:var(--t9)}
+  .issue-status-open{color:var(--danger);font-weight:700;font-size:11px}
+  .issue-status-resolved{color:#2b7a1f;font-weight:700;font-size:11px}
+  .issue-desc{color:var(--t6);margin-bottom:4px}
+  .btn-resolve{background:none;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:600;color:var(--t7);cursor:pointer}
+  .issue-empty{font-size:12px;color:var(--t6);margin-bottom:10px}
+
   .empty-msg{text-align:center;color:var(--t6);font-size:13px;padding:40px 0}
 
   /* DETAIL PANEL */
@@ -259,6 +271,29 @@
       </div>
     </div>
 
+    <div class="issue-section">
+      <div class="pay-title">⚠ Issues / Concerns</div>
+      <div id="issueList"></div>
+
+      <div class="issue-add-row">
+        <select class="finp" id="newIssueType">
+          <option value="clinical_concern">Clinical concern</option>
+          <option value="service_complaint">Service complaint</option>
+          <option value="late_or_no_show">Late / no-show</option>
+          <option value="payment_issue">Payment issue</option>
+          <option value="other">Other</option>
+        </select>
+        <select class="finp" id="newIssueRaisedBy">
+          <option value="coordinator">Raised by: Coordinator</option>
+          <option value="patient">Raised by: Patient</option>
+          <option value="provider">Raised by: Provider</option>
+        </select>
+      </div>
+      <textarea class="ftxt" id="newIssueDesc" placeholder="Short description of the concern" style="min-height:44px"></textarea>
+      <button type="button" class="btn-add" id="addIssueBtn" style="margin-top:8px;width:100%">+ Add Issue</button>
+      <div class="err-msg" id="issueErr"></div>
+    </div>
+
     <div class="err-msg" id="saveErr"></div>
 
     <div class="panel-acts">
@@ -335,7 +370,7 @@
 // ══════════════════════════════════════
 const AW_ENDPOINT = 'https://sgp.cloud.appwrite.io/v1';
 const AW_PROJECT  = '6a95aa00000e9fcbd0e6';
-const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients', PROVIDERS = 'providers', PAYMENTS = 'payments';
+const DB_ID = 'homecare', VISITS = 'visits', PATIENTS = 'patients', PROVIDERS = 'providers', PAYMENTS = 'payments', ISSUES = 'issues';
 
 const client = new Appwrite.Client().setEndpoint(AW_ENDPOINT).setProject(AW_PROJECT);
 const account = new Appwrite.Account(client);
@@ -347,6 +382,7 @@ let visitsCache = [];   // last loaded visits
 let providersCache = []; // last loaded providers
 let providerMap = {};   // provider_id -> provider row
 let paymentsByVisit = {}; // visit_id -> payment row
+let issuesByVisit = {};   // visit_id -> array of issue rows
 let activeVisitId = null;
 let activePaymentId = null;  // the payment row's own $id for the open visit, if it exists yet
 let activeProviderId = null; // null = creating a new provider
@@ -411,11 +447,12 @@ async function loadAll(){
   document.getElementById('listContainer').innerHTML = '<div class="loading">Loading bookings…</div>';
   document.getElementById('providerListContainer').innerHTML = '<div class="loading">Loading providers…</div>';
   try {
-    const [patientsRes, visitsRes, providersRes, paymentsRes] = await Promise.all([
+    const [patientsRes, visitsRes, providersRes, paymentsRes, issuesRes] = await Promise.all([
       tablesDB.listRows(DB_ID, PATIENTS, [Query.limit(200)]),
       tablesDB.listRows(DB_ID, VISITS, [Query.orderDesc('$createdAt'), Query.limit(200)]),
       tablesDB.listRows(DB_ID, PROVIDERS, [Query.limit(200)]),
       tablesDB.listRows(DB_ID, PAYMENTS, [Query.limit(200)]),
+      tablesDB.listRows(DB_ID, ISSUES, [Query.limit(300)]),
     ]);
     patientMap = {};
     patientsRes.rows.forEach(p => patientMap[p.$id] = p);
@@ -425,6 +462,10 @@ async function loadAll(){
     providersCache.forEach(p => providerMap[p.$id] = p);
     paymentsByVisit = {};
     paymentsRes.rows.forEach(pay => paymentsByVisit[pay.visit_id] = pay);
+    issuesByVisit = {};
+    issuesRes.rows.forEach(iss => {
+      (issuesByVisit[iss.visit_id] = issuesByVisit[iss.visit_id] || []).push(iss);
+    });
     renderList();
     renderProviders();
   } catch (err) {
@@ -464,6 +505,7 @@ function renderList(){
       <div class="vc-top" style="margin-top:6px;margin-bottom:0">
         <span class="vc-ref">${escapeHtml(v.reference_code || '')}</span>
         ${v.concern_flag ? '<span class="concern-flag">⚠ CONCERN</span>' : ''}
+        ${(issuesByVisit[v.$id]||[]).filter(i=>i.status==='open').length ? '<span class="concern-flag">🚩 ' + (issuesByVisit[v.$id]||[]).filter(i=>i.status==='open').length + ' open issue(s)</span>' : ''}
       </div>
       ${paymentsByVisit[v.$id] ? `<div class="pc-tags" style="margin-top:6px">
         <span class="pay-badge pay-${paymentsByVisit[v.$id].patient_payment_status}">Patient: ${paymentsByVisit[v.$id].patient_payment_status}</span>
@@ -524,6 +566,12 @@ function openDetail(visitId, opts){
   document.getElementById('dProviderAmt').value = payment?.provider_payable_amount ?? '';
   document.getElementById('dProviderStatus').value = payment?.provider_payment_status || 'pending';
   document.getElementById('dPayNotes').value = payment?.notes || '';
+
+  renderIssueList(v.$id);
+  document.getElementById('newIssueDesc').value = '';
+  document.getElementById('newIssueType').value = 'clinical_concern';
+  document.getElementById('newIssueRaisedBy').value = 'coordinator';
+  clearErr(document.getElementById('issueErr'));
 
   clearErr(document.getElementById('saveErr'));
 
@@ -592,6 +640,81 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
 document.getElementById('statusFilter').addEventListener('change', renderList);
 document.getElementById('refreshBtn').addEventListener('click', loadAll);
+
+// ══════════════════════════════════════
+// ISSUES / CONCERNS — many per visit
+// ══════════════════════════════════════
+const ISSUE_TYPE_LABELS = {
+  clinical_concern: 'Clinical concern', service_complaint: 'Service complaint',
+  late_or_no_show: 'Late / no-show', payment_issue: 'Payment issue', other: 'Other',
+};
+
+function renderIssueList(visitId){
+  const list = issuesByVisit[visitId] || [];
+  const container = document.getElementById('issueList');
+  if (!list.length){
+    container.innerHTML = '<div class="issue-empty">No issues logged for this visit.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  list.forEach(iss => {
+    const item = document.createElement('div');
+    item.className = 'issue-item';
+    item.innerHTML = `
+      <div class="issue-item-top">
+        <span class="issue-type-lbl">${ISSUE_TYPE_LABELS[iss.issue_type] || iss.issue_type}</span>
+        <span class="issue-status-${iss.status}">${iss.status}</span>
+      </div>
+      ${iss.description ? '<div class="issue-desc">' + escapeHtml(iss.description) + '</div>' : ''}
+      <div class="issue-desc">Raised by: ${escapeHtml(iss.raised_by || '')}</div>
+      ${iss.status === 'open' ? '<button type="button" class="btn-resolve" data-issue="' + iss.$id + '">Mark Resolved</button>' : ''}
+    `;
+    container.appendChild(item);
+    const resolveBtn = item.querySelector('.btn-resolve');
+    if (resolveBtn){
+      resolveBtn.addEventListener('click', () => resolveIssue(iss.$id, visitId));
+    }
+  });
+}
+
+async function resolveIssue(issueId, visitId){
+  try {
+    await tablesDB.updateRow(DB_ID, ISSUES, issueId, { status: 'resolved' });
+    const list = issuesByVisit[visitId] || [];
+    const found = list.find(i => i.$id === issueId);
+    if (found) found.status = 'resolved';
+    renderIssueList(visitId);
+    renderList();
+  } catch (err) {
+    showErr(document.getElementById('issueErr'), 'Could not resolve: ' + (err.message || 'unknown error'));
+  }
+}
+
+document.getElementById('addIssueBtn').addEventListener('click', async () => {
+  if (!activeVisitId) return;
+  const errEl = document.getElementById('issueErr');
+  clearErr(errEl);
+  const description = document.getElementById('newIssueDesc').value.trim();
+  const btn = document.getElementById('addIssueBtn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+  try {
+    const newIssue = await tablesDB.createRow(DB_ID, ISSUES, Appwrite.ID.unique(), {
+      visit_id: activeVisitId,
+      issue_type: document.getElementById('newIssueType').value,
+      raised_by: document.getElementById('newIssueRaisedBy').value,
+      description,
+      status: 'open',
+    });
+    (issuesByVisit[activeVisitId] = issuesByVisit[activeVisitId] || []).push(newIssue);
+    document.getElementById('newIssueDesc').value = '';
+    renderIssueList(activeVisitId);
+    renderList();
+  } catch (err) {
+    showErr(errEl, 'Could not add issue: ' + (err.message || 'unknown error'));
+  } finally {
+    btn.disabled = false; btn.textContent = '+ Add Issue';
+  }
+});
 
 // ══════════════════════════════════════
 // PROVIDERS — list + create/edit

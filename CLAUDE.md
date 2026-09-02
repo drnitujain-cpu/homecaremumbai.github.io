@@ -207,8 +207,13 @@ patient info joined in for display). This is the first slice only:
   (created on first save if it doesn't exist yet) — patient receivable amount + status
   (pending/partial/paid) and provider payable amount + status (pending/paid), kept as
   separate fields per §5. Payment status shows as badges on each booking card.
-- **What it does NOT do yet**: no provider accept/decline flow, no issues table — later
-  slices of this same milestone, added one at a time, not all at once.
+  An **Issues / Concerns** block inside the same panel lists all issues logged against
+  that visit (type, description, raised-by, open/resolved) with a "Mark Resolved" button
+  per open one, plus a small form to log a new issue immediately (its own action, not tied
+  to the main Save Changes) — matches the `issues` table's one-to-many-per-visit shape
+  from §5. Open-issue count shows as a badge on the booking card.
+- **What it does NOT do yet**: no provider accept/decline flow — that's the one remaining
+  piece from the original workflow, whenever it's worth adding.
 
 ## 9. Notification channels (coordinator-facing, free tier)
 
