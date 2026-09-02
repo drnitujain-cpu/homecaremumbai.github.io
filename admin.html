@@ -636,10 +636,22 @@ function toWaNumber(phone){
   return digits;
 }
 
-function sendWaMessage(phone, text){
+function sendWaMessage(phone, text, teamNote){
   const num = toWaNumber(phone);
   if (!num) { alert('No phone number on file to message.'); return; }
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
+  if (teamNote) notifyTeam(teamNote.subject, teamNote.text);
+}
+
+// Best-effort notice to the shared Telegram/email channel (receptionist +
+// admin) -- never blocks the UI, never shown as an error if it fails,
+// since the real action (saving, or opening WhatsApp) already succeeded.
+function notifyTeam(subject, text){
+  fetch('/.netlify/functions/notify-team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subject, text }),
+  }).catch(() => {});
 }
 
 function buildPatientMessage(v, patient){
@@ -650,7 +662,7 @@ function buildPatientMessage(v, patient){
     `🩺 Service: ${v.service_type || ''}`,
     v.requested_date ? `📅 Date: ${v.requested_date.slice(0,10)}${v.requested_time_slot ? ' (' + v.requested_time_slot + ')' : ''}` : '',
     `📍 Status: ${STATUS_LABELS[v.status] || v.status || ''}`,
-    provider ? `👤 Provider: ${provider.full_name}` : '',
+    provider ? `👤 Provider: ${provider.full_name} — 📞 ${provider.phone || ''}` : '',
     (payment && payment.patient_payment_status !== 'paid' && payment.patient_receivable_amount)
       ? `💰 Amount due: ₹${payment.patient_receivable_amount} (${payment.patient_payment_status})` : '',
     '',
@@ -663,7 +675,7 @@ function buildProviderMessage(v, patient, provider){
   const payment = paymentsByVisit[v.$id];
   const lines = [
     `Hi ${provider.full_name || ''}, you've been assigned a HomeCare Mumbai visit:`,
-    `👤 Patient: ${patient.full_name || ''}`,
+    `👤 Patient: ${patient.full_name || ''} — 📞 ${patient.phone || ''}`,
     `📍 ${patient.address || v.address || ''}, ${v.area || ''}`,
     `🩺 Service: ${v.service_type || ''}`,
     v.requested_date ? `📅 Date: ${v.requested_date.slice(0,10)}${v.requested_time_slot ? ' (' + v.requested_time_slot + ')' : ''}` : '',
@@ -711,10 +723,16 @@ function openDetail(visitId, opts){
   refreshProviderConfirmUI();
   provSel.onchange = refreshProviderConfirmUI;
 
-  document.getElementById('msgPatientBtn').onclick = () => sendWaMessage(patient.phone, buildPatientMessage(v, patient));
+  document.getElementById('msgPatientBtn').onclick = () => sendWaMessage(patient.phone, buildPatientMessage(v, patient), {
+    subject: `📤 Patient message opened — ${v.reference_code}`,
+    text: `📤 A WhatsApp message was opened for the patient on booking ${v.reference_code}.\nPatient: ${patient.full_name} (${patient.phone})\nStatus: ${STATUS_LABELS[v.status] || v.status}`,
+  });
   document.getElementById('msgProviderBtn').onclick = () => {
     const prov = providerMap[provSel.value];
-    if (prov) sendWaMessage(prov.phone, buildProviderMessage(v, patient, prov));
+    if (prov) sendWaMessage(prov.phone, buildProviderMessage(v, patient, prov), {
+      subject: `📤 Provider message opened — ${v.reference_code}`,
+      text: `📤 A WhatsApp message was opened for the provider on booking ${v.reference_code}.\nProvider: ${prov.full_name} (${prov.phone})\nPatient: ${patient.full_name}`,
+    });
   };
 
   document.getElementById('dStatus').value = opts.quickComplete ? 'completed' : (v.status || 'new_request');
@@ -792,6 +810,26 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     } else {
       await tablesDB.createRow(DB_ID, PAYMENTS, Appwrite.ID.unique(), paymentData);
     }
+
+    // Summary notice to the shared receptionist/admin channel -- best
+    // effort, never blocks the save that already succeeded.
+    const v = visitsCache.find(x => x.$id === activeVisitId);
+    const patient = v ? (patientMap[v.patient_id] || {}) : {};
+    const newProvider = document.getElementById('dProvider').value ? providerMap[document.getElementById('dProvider').value] : null;
+    const notesNow = document.getElementById('dNotes').value.trim();
+    notifyTeam(
+      `📋 Booking update — ${v?.reference_code || ''} (${STATUS_LABELS[status] || status})`,
+      [
+        `📋 Booking status update — ${v?.reference_code || ''}`,
+        `👤 Patient: ${patient.full_name || ''} (${patient.phone || ''})`,
+        newProvider ? `🧑‍⚕️ Provider: ${newProvider.full_name} (${newProvider.phone || ''})` : '🧑‍⚕️ Provider: Unassigned',
+        `🩺 Service: ${v?.service_type || ''} · 📍 ${v?.area || ''}`,
+        `📌 Status: ${STATUS_LABELS[status] || status}`,
+        notesNow ? `📝 Notes: ${notesNow}` : '',
+        '',
+        'Receptionist: please coordinate. Admin: for review.',
+      ].filter(Boolean).join('\n')
+    );
 
     closeDetail();
     await loadAll();

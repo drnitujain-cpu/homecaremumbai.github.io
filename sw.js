@@ -1,7 +1,7 @@
-// CareBridge Mumbai — Service Worker v1.8
+// CareBridge Mumbai — Service Worker v1.9
 // Bump CACHE whenever index.html/admin.html/join.html/manifest.json changes
 // so returning visitors/coordinators get the fresh version, not a stale cache.
-const CACHE = 'carebridge-v9';
+const CACHE = 'carebridge-v10';
 const OFFLINE_URL = '/index.html';
 
 const PRECACHE = [

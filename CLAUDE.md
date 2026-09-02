@@ -215,10 +215,19 @@ patient info joined in for display). This is the first slice only:
   from §5. Open-issue count shows as a badge on the booking card.
 - **WhatsApp, manual-send, from inside the panel**: a "💬 Message Patient" button and a
   "💬 Message Provider" button (shown once a provider is assigned) each build a message
-  from the visit's current state (service, date, assigned provider, amount due) and open
-  `wa.me` pre-filled — the coordinator still taps Send themselves. Nothing is sent
-  automatically and no message content is stored; this is the same manual pattern already
-  used on the public site, just reachable from the workflow instead of typed from scratch.
+  from the visit's current state (service, date, assigned provider + phone, patient +
+  phone/address, amount due) and open `wa.me` pre-filled — the coordinator still taps Send
+  themselves. Nothing is sent automatically and no message content is stored; this is the
+  same manual pattern already used on the public site, just reachable from the workflow
+  instead of typed from scratch.
+- **Team summary notifications** (`netlify/functions/notify-team.js`, no Appwrite access at
+  all — it only relays to Telegram/email): fires automatically on every booking Save
+  (patient, provider, service, area, status, notes) and on every WhatsApp button tap
+  (a short "message opened" notice) — same shared Telegram/email channel as new-booking
+  alerts. This keeps a receptionist/coordinator and the admin/owner in the loop without
+  either needing to open the admin app themselves. If/when Receptionist and Admin become
+  genuinely separate people, give them a second Telegram bot/chat and extend
+  `notifyCoordinator` to fan out to both — no other change needed.
 - **Five tabs total**: Bookings, Providers, **Issues** (every issue across every visit, one
   place, filterable by open/resolved, with patient/service context), **Payments** (every
   payment record across every visit, filterable by patient payment status, with running
